@@ -1,10 +1,10 @@
 {
-  "name": "tiny-supporter",
+  "name": "@noravel/supporter",
   "version": "1.8.0",
   "description": "This is a support library for my personal projects.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ttpn18121996/tiny-supporter.git"
+    "url": "https://github.com/ttpn18121996/noravel-supporter.git"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -22,7 +22,7 @@
   "prepare": "npm run build",
   "author": "Trịnh Trần Phương Nam <ttpn18121996@gmail.com>",
   "license": "ISC",
-  "homepage": "https://github.com/ttpn18121996/tiny-supporter",
+  "homepage": "https://github.com/ttpn18121996/noravel-supporter",
   "devDependencies": {
     "jest": "^29.7.0",
     "prettier": "^3.3.3",

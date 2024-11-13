@@ -1,15 +1,15 @@
-# Tiny supporter
+# Noravel supporter
 
 This is a support library for Nam's projects.
 
 ## \_obj
 
 ```js
-const { _obj } = require('tiny-supporter');
+const { _obj } = require('@noravel/supporter');
 
 # OR
 
-import { _obj } from 'tiny-supporter';
+import { _obj } from '@noravel/supporter';
 ```
 
 ### \_obj.combine()
@@ -193,11 +193,11 @@ JSON.stringify(user) === JSON.stringify(clone); // true
 ## \_arr()
 
 ```js
-const { _arr } = require('tiny-supporter');
+const { _arr } = require('@noravel/supporter');
 
 # OR
 
-import { _arr } from 'tiny-supporter';
+import { _arr } from '@noravel/supporter';
 ```
 
 ### \_arr().get()
@@ -462,11 +462,11 @@ console.log(_arr([]).supplement(10).isEmpty()); // false
 ## \_str()
 
 ```js
-const { _str } = require('tiny-supporter');
+const { _str } = require('@noravel/supporter');
 
 # OR
 
-import { _str } from 'tiny-supporter';
+import { _str } from '@noravel/supporter';
 ```
 
 ### \_str().get()
@@ -792,11 +792,11 @@ console.log(
 Determine if a variable is declared and is different than null.
 
 ```js
-const { isset } = require('tiny-supporter');
+const { isset } = require('@noravel/supporter');
 
 # OR
 
-import { isset } from 'tiny-supporter';
+import { isset } from '@noravel/supporter';
 ```
 
 Except for undefined and null, everything will return true;
@@ -811,11 +811,11 @@ console.log(isset(null)); // false
 Determine whether a variable is empty.
 
 ```js
-const { empty } = require('tiny-supporter');
+const { empty } = require('@noravel/supporter');
 
 # OR
 
-import { empty } from 'tiny-supporter';
+import { empty } from '@noravel/supporter';
 ```
 
 ```js
@@ -848,11 +848,11 @@ console.log(
 If you want to check the exact data type then typeOf will help you.
 
 ```js
-const { typeOf } = require('tiny-supporter');
+const { typeOf } = require('@noravel/supporter');
 
 # OR
 
-import { typeOf } from 'tiny-supporter';
+import { typeOf } from '@noravel/supporter';
 ```
 
 What makes this function different from typeof is:
