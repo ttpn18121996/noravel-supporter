@@ -275,7 +275,7 @@ export default class Str {
     this.value = this.nonUnicode()
       .get()
       .replace(/[A-Z]/g, match => delimiter + match.toLocaleLowerCase())
-      .replace(/[\s]+/g, '')
+      .replace(new RegExp('[\\s\\' + delimiter + ']+', 'g'), delimiter)
       .replace(new RegExp('^' + delimiter), '');
 
     return this;
