@@ -116,6 +116,8 @@ export default class Arr {
         for (let i = start; i >= end; i -= step) {
           result.push(i);
         }
+      } else {
+        result.push(start);
       }
     }
 
