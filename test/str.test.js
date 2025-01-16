@@ -237,3 +237,7 @@ describe('it can be cast to string type', () => {
     }`);
   });
 });
+
+test('it can dump the string', () => {
+  expect(_str('Nam').dump()).toEqual({value: 'Nam'});
+});
