@@ -212,6 +212,16 @@ console.log(_arr([1, 2, 3, 4, 5, 6]).get()); // [1, 2, 3, 4, 5, 6]
 console.log(_arr([1, 2, 3, 4, 5, 6]).toArray()); // [1, 2, 3, 4, 5, 6]
 ```
 
+### \_arr().collapse()
+
+Collapse the array into a single array.
+
+```js
+const data = [[1, 2, 3], [4, 5, 6, 7], [8, 9], [10]];
+
+console.log(_arr(data).collapse().get()); // [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+```
+
 ### \_arr().chunk()
 
 Chunk the array into chunks of the given size.
@@ -457,6 +467,21 @@ Check for empty array.
 ```js
 console.log(_arr([]).isEmpty()); // true
 console.log(_arr([]).supplement(10).isEmpty()); // false
+```
+
+### \_arr().dump()
+
+You can log the results of each processing segment for easy debugging.
+
+```js
+_arr()
+  .range(3)
+  .dump()
+  .map(i => i + 1)
+  .dump();
+
+// [0, 1, 2]
+// [1, 2, 3]
 ```
 
 ## \_str()
@@ -783,6 +808,29 @@ console.log(
     return 'this is a function';
   }),
 ); // function () { return 'this is a function'; }
+```
+
+### \_str().dump()
+
+Same as `_arr().dump()` You can log the results of each processing segment for easy debugging.
+
+```js
+_str('namttp@example.com')
+  .before('@')
+  .dump()
+  .slice(-3)
+  .dump()
+  .padStart(_str(email).before('@').length(), '*')
+  .dump()
+  .append(_str(email).after('@').prepend('@').get())
+  .dump();
+
+/*
+namttp
+ttp
+***ttp
+***ttp@example.com
+*/
 ```
 
 ## helper
