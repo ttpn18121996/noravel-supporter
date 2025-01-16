@@ -200,18 +200,6 @@ const { _arr } = require('@noravel/supporter');
 import { _arr } from '@noravel/supporter';
 ```
 
-### \_arr().get()
-
-Gets the array value of this object.
-
-```js
-console.log(_arr([1, 2, 3, 4, 5, 6]).get()); // [1, 2, 3, 4, 5, 6]
-
-# OR
-
-console.log(_arr([1, 2, 3, 4, 5, 6]).toArray()); // [1, 2, 3, 4, 5, 6]
-```
-
 ### \_arr().collapse()
 
 Collapse the array into a single array.
@@ -219,7 +207,7 @@ Collapse the array into a single array.
 ```js
 const data = [[1, 2, 3], [4, 5, 6, 7], [8, 9], [10]];
 
-console.log(_arr(data).collapse().get()); // [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+console.log(_arr(data).collapse()); // [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 ```
 
 ### \_arr().chunk()
@@ -229,7 +217,7 @@ Chunk the array into chunks of the given size.
 ```js
 const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-console.log(_arr(data).chunk(2).get()); // [[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]]
+console.log(_arr(data).chunk(2)); // [[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]]
 ```
 
 ### \_arr().first()
@@ -240,25 +228,6 @@ Returns the first element of the array.
 const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 console.log(_arr(data).first()); // 1
-```
-
-### \_arr().map()
-
-Run a map over each of the items in the array.
-
-```js
-const users = [
-  {
-    id: 1,
-    name: 'Trinh Tran Phuong Nam',
-  },
-  {
-    id: 2,
-    name: 'John Doe',
-  },
-];
-
-console.log(_arr(users).map(user => user.name)); // ['Trinh Tran Phuong Nam', 'John Doe']
 ```
 
 ### \_arr().mapToGroups()
@@ -306,7 +275,7 @@ const users = [
   },
 ];
 
-console.log(_arr(users).pluck('id').get()); // [1, 2]
+console.log(_arr(users).pluck('id')); // [1, 2]
 ```
 
 ### \_arr().range()
@@ -314,12 +283,12 @@ console.log(_arr(users).pluck('id').get()); // [1, 2]
 Creates an array of numbers processing from "start" up to "end" (including "end").
 
 ```js
-console.log(_arr().range(10), get()); // [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-console.log(_arr().range(-10), get()); // [-10, -9, -8, -7, -6, -5, -4, -3, -2, -1]
-console.log(_arr().range(0, 10), get()); // [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-console.log(_arr().range(1, 10, 2), get()); // [1, 3, 5, 7, 9]
-console.log(_arr().range(10, 1), get()); // [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
-console.log(_arr().range(10, 1, 2), get()); // [10, 8, 6, 4, 2]
+console.log(_arr().range(10)); // [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+console.log(_arr().range(-10)); // [-10, -9, -8, -7, -6, -5, -4, -3, -2, -1]
+console.log(_arr().range(0, 10)); // [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+console.log(_arr().range(1, 10, 2)); // [1, 3, 5, 7, 9]
+console.log(_arr().range(10, 1)); // [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+console.log(_arr().range(10, 1, 2)); // [10, 8, 6, 4, 2]
 ```
 
 ### \_arr().supplement()
@@ -329,8 +298,8 @@ Add elements to ensure the length of the array.
 ```js
 const data = ['a', 'b', 'c'];
 
-console.log(_arr(data).supplement(5), get()); // ['a', 'b', 'c', null, null]
-console.log(_arr(data).supplement(5, 'additional item'), get()); // ['a', 'b', 'c', 'additional item', 'additional item']
+console.log(_arr(data).supplement(5)); // ['a', 'b', 'c', null, null]
+console.log(_arr(data).supplement(5, 'additional item')); // ['a', 'b', 'c', 'additional item', 'additional item']
 ```
 
 ### \_arr().unique()
@@ -339,7 +308,7 @@ Filter out duplicate elements to ensure that array elements are unique.
 
 ```js
 const data = ['a', 'b', 1, 2, 'a', '1'];
-console.log(_arr(data).unique().get()); // ['a', 'b', 1, 2, '1']
+console.log(_arr(data).unique()); // ['a', 'b', 1, 2, '1']
 ```
 
 Check for a unique value for an array element that is an object by key.
@@ -360,7 +329,7 @@ const users = [
   },
 ];
 
-console.log(_arr(users).unique('id').get());
+console.log(_arr(users).unique('id'));
 /*
 [
   {
@@ -450,14 +419,6 @@ console.log(_arr(status).toSelectOptions());
   },
 ]
 */
-```
-
-### \_arr().count()
-
-Count the element of this array.
-
-```js
-console.log(_arr([1, 2, 3]).count()); // 3
 ```
 
 ### \_arr().isEmpty()
