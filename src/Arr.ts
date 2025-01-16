@@ -8,6 +8,22 @@ export default class Arr {
   }
 
   /**
+   * Collapse the array into a single array.
+   * @returns {Arr}
+   */
+  public collapse(): this {
+    this.value = this.value.reduce((result: any[], item) => {
+      if (!Array.isArray(item)) {
+        return result;
+      }
+
+      return [...result, ...item];
+    }, []);
+
+    return this;
+  }
+
+  /**
    * Chunk the array into chunks of the given size.
    * @param {number} size
    * @returns {Arr}
@@ -212,5 +228,15 @@ export default class Arr {
    */
   public get(): any[] {
     return this.toArray();
+  }
+
+  /**
+   * Print the array value of this object.
+   * @returns {Arr}
+   */
+  public dump(): this {
+    console.log(this.value);
+
+    return this;
   }
 }

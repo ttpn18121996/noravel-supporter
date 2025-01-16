@@ -472,4 +472,14 @@ export default class Str {
       ? value.toString()
       : `${value}`;
   }
+
+  /**
+   * Prints a string to the console.
+   * @returns {Str}
+   */
+  public dump(): this {
+    console.log(this.value);
+
+    return this;
+  }
 }

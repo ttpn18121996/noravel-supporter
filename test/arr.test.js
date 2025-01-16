@@ -1,5 +1,16 @@
 const { _arr } = require('../dist');
 
+test('it can collapse an array', () => {
+  const arr = [
+    [1, 2],
+    [3, 4],
+    [5, 6],
+  ];
+  const arr1 = [[1, 2, 3], [4, 5], 6];
+  expect(_arr(arr).collapse().toArray()).toEqual([1, 2, 3, 4, 5, 6]);
+  expect(_arr(arr1).collapse().toArray()).toEqual([1, 2, 3, 4, 5]);
+});
+
 test('it can chunk items of an array', () => {
   const arr = [1, 2, 3, 4, 5, 6];
   expect(_arr(arr).chunk().toArray()).toEqual([[1], [2], [3], [4], [5], [6]]);
