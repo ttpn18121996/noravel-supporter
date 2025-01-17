@@ -161,7 +161,7 @@ class Obj {
           urlSearchParams.append(`${key}[${field}]`, value);
         }
       } else {
-        urlSearchParams.append(key, new Str('').caseString(obj[key]));
+        urlSearchParams.append(key, new Str(obj[key]).toString());
       }
     }
 

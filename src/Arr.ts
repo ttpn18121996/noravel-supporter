@@ -210,12 +210,14 @@ export default class Arr extends Array {
   }
 
   /**
-   * Print the array value of this object.
-   * @returns {Arr}
+   * Register a macro.
+   * @param {string} name
+   * @param {Function} callback
+   * @returns {void}
    */
-  public dump(): this {
-    console.log(this);
-
-    return this;
+  static macro(name: any, callback: () => any): void {
+    if (typeOf(name) === 'string') {
+      Arr.prototype[name] = callback;
+    }
   }
 }

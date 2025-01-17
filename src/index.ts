@@ -1,6 +1,7 @@
 import Arr from './Arr';
 import Obj from './Obj';
 import Str from './Str';
+import StringHelper from './Support/StringHelper';
 
 /**
  * Check if a certain value exists or not.
@@ -81,4 +82,4 @@ export const _arr = (value: any[] | null | undefined = []): Arr => Arr.new(value
  */
 export const _obj = Obj;
 
-export { Arr, Obj, Str };
+export { Arr, Obj, Str, StringHelper };

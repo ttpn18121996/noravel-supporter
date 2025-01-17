@@ -148,7 +148,3 @@ test('it can check for emptiness', () => {
 test('it can get a raw array value', () => {
   expect(_arr({ id: 1 })).toEqual([{ id: 1 }]);
 });
-
-test('it can dump the array', () => {
-  expect(_arr([1, 2, 3]).dump()).toEqual([1, 2, 3]);
-});
