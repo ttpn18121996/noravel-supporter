@@ -1,4 +1,5 @@
 import Arr from './Arr';
+import Collection from './Collection';
 import Obj from './Obj';
 import Str from './Str';
 import StringHelper from './Support/StringHelper';
@@ -82,4 +83,6 @@ export const _arr = (value: any[] | null | undefined = []): Arr => Arr.new(value
  */
 export const _obj = Obj;
 
-export { Arr, Obj, Str, StringHelper };
+export const _col = <T>(items: T[] = []) => new Collection<T>(items);
+
+export { Arr, Collection, Obj, Str, StringHelper };
