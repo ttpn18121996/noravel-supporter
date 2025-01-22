@@ -48,7 +48,7 @@ export default class Collection<T> {
       return result;
     }, []);
 
-    return new Collection<typeof items[0]>(items);
+    return new Collection<(typeof items)[0]>(items);
   }
 
   /**
@@ -71,7 +71,7 @@ export default class Collection<T> {
       return [...result, ...item];
     }, []);
 
-    return new Collection<typeof items[0]>(items);
+    return new Collection<(typeof items)[0]>(items);
   }
 
   /**
@@ -90,8 +90,8 @@ export default class Collection<T> {
    * @returns {this}
    * @chainable
    */
-  public concat(items: Collection<T>|unknown[]) {
-    return new Collection([...this.items, ...<[]>items]);
+  public concat(items: Collection<T> | unknown[]) {
+    return new Collection([...this.items, ...(<[]>items)]);
   }
 
   /**
@@ -111,5 +111,5 @@ export default class Collection<T> {
     return this.items.length;
   }
 
-  public diff(items: Collection<T>|unknown[]) {}
+  public diff(items: Collection<T> | unknown[]) {}
 }

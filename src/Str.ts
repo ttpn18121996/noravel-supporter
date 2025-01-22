@@ -86,7 +86,6 @@ export default class Str {
     return this;
   }
 
-
   /**
    * Get the raw string value.
    * @returns {string}
