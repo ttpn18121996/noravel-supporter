@@ -14,7 +14,7 @@ export default class Collection<T> {
    * @returns {T[]} the underlying array
    */
   public all(): T[] {
-    return this.items;
+    return this.toArray();
   }
 
   /**
@@ -131,15 +131,18 @@ export default class Collection<T> {
    * Iterates over the items in the collection and calls the provided callback for each item.
    * If the callback returns a boolean false, iteration will be stopped.
    *
-   * @param {Function} callback A function that takes in a value, index and array and returns a boolean.
-   * @returns {void}
+   * @param {Function} callback A function that takes in a value, index and array and returns a boolean (or undefined).
+   * @returns {this}
+   * @chainable
    */
-  public each(callback: (value: T, index: number, array: T[]) => boolean | undefined): void {
+  public each(callback: (value: T, index: number, array: T[]) => boolean | undefined): this {
     for (let i = 0; i < this.items.length; i++) {
-      const result = callback(this.items[i], i, this.items);
-
-      if (result === false) break;
+      if (callback(this.items[i], i, this.items) === false) {
+        break;
+      }
     }
+
+    return this;
   }
 
   /**
@@ -484,6 +487,12 @@ export default class Collection<T> {
     return new Collection<T>(this.items.splice(start, deleteCount));
   }
 
+  /**
+   * Splits the items of the collection into a specified number of groups.
+   *
+   * @param {number} numberOfGroups The number of groups to split the items into.
+   * @returns {Collection<T[]>} A new collection with the items split into a specified number of groups.
+   */
   public split(numberOfGroups: number) {
     const groupSize = Math.floor(this.items.length / numberOfGroups);
     const items = this.items;
@@ -504,5 +513,117 @@ export default class Collection<T> {
     }
 
     return new Collection(result);
+  }
+
+  /**
+   * Calculates the sum of a collection of items.
+   *
+   * If the collection contains primitive numbers, the sum of the numbers is returned.
+   * If the collection contains arrays, the sum of the length of the arrays is returned.
+   * If the collection contains objects, the sum of the value of the given key is returned.
+   * If the collection contains a mix of the above, the sum of all the values is returned.
+   *
+   * @param {string} [key] The key to use to calculate the sum of the objects.
+   * @returns {number} The sum of the collection.
+   */
+  public sum(key?: string) {
+    return this.items.reduce<number>((total, item) => {
+      if (Array.isArray(item)) {
+        return total + item.length;
+      } else if (typeof item === 'object' && typeof item?.[key as keyof T] === 'number') {
+        return total + (item[key as keyof T] as number);
+      } else if (typeof item === 'number') {
+        return total + item;
+      }
+
+      return total + 1;
+    }, 0);
+  }
+
+  /**
+   * Pass the collection to the given callback and return the collection.
+   *
+   * This method is useful for tapping into a collection chain to perform any
+   * debugging or logging related tasks.
+   *
+   * @param {Function} callback
+   * @returns {this}
+   */
+  public tap(callback: (collection: Collection<T>) => void): this {
+    callback(this);
+
+    return this;
+  }
+
+  public toArray(): T[] {
+    return this.items;
+  }
+
+  public toJson(): string {
+    return JSON.stringify(this.items);
+  }
+
+  /**
+   * Filter out duplicate elements to ensure that array elements are unique.
+   *
+   * @param {string} [key] The key is used to check for a unique value for an array element that is an object.
+   * @returns {Collection<T>}
+   */
+  public unique(key?: string): Collection<T> {
+    let items: T[];
+
+    if (key) {
+      items = [...new Map(this.items.map(item => [item[key as keyof T], item])).values()];
+    } else if (typeof this.items[0] === 'object') {
+      items = this.items.filter(
+        (item: T, index) =>
+          this.items.findIndex((other: T) =>
+            Obj.equals(item as { [key: string]: any }, other as { [key: string]: any }),
+          ) === index,
+      );
+    } else {
+      items = [...new Set(this.items)];
+    }
+
+    return new Collection(items);
+  }
+
+  /**
+   * Execute a callback when a condition is truthy.
+   *
+   * @param {any} condition A value or a function that takes the collection and returns a value.
+   * @param {(collection: Collection<T>, value: unknown) => unknown} callback A function that takes the collection and the condition value.
+   * @param {(collection: Collection<T>, value: unknown) => unknown} [defaultValue] An optional function that takes the collection and the condition value and returns a value.
+   * @returns {unknown} The return value of the callback or the default value if the condition is falsy.
+   */
+  public when(
+    condition: any,
+    callback: (collection: Collection<T>, value: unknown) => unknown,
+    defaultValue?: (collection: Collection<T>, value: unknown) => unknown,
+  ) {
+    const value = typeof condition === 'function' ? condition(this) : condition;
+
+    if (value) {
+      return callback(this, value) ?? this;
+    } else if (defaultValue) {
+      return defaultValue(this, value) ?? this;
+    }
+
+    return this;
+  }
+
+  /**
+   * Create a new collection with the given item.
+   * If the given item is not an array, it will be converted to an array.
+   *
+   * @param {any} item
+   * @returns {Collection<unknown>}
+   */
+  static wrap(item: any): Collection<unknown> {
+    if (!Array.isArray(item)) {
+      item = [item];
+    }
+
+    return new Collection(item);
   }
 }

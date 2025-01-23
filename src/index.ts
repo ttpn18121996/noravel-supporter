@@ -3,70 +3,32 @@ import Collection from './Collection';
 import Obj from './Obj';
 import Str from './Str';
 import StringHelper from './Support/StringHelper';
+import Helper from './Support/Helper';
 
 /**
  * Check if a certain value exists or not.
  */
-export const isset = (value: any): boolean => {
-  return value !== undefined && value !== null;
-};
+export const isset = Helper.isset;
 
 /**
  * Check if a certain value is empty or not.
  */
-export const empty = (value: any): boolean => {
-  if (Array.isArray(value)) {
-    return value.length === 0;
-  } else if (typeOf(value) === 'object') {
-    if (value.hasOwnProperty('count') || typeof value.count === 'function') {
-      return value.count() === 0;
-    } else if (value.hasOwnProperty('isEmpty') || typeof value.isEmpty === 'function') {
-      return value.isEmpty();
-    } else {
-      return Object.keys(value).length === 0;
-    }
-  }
-
-  return value === undefined || value === null || value === false || value === '' || value === 0;
-};
+export const empty = Helper.empty;
 
 /**
  * Check the exact data type of a certain value.
  */
-export const typeOf = function (value: any): string {
-  const result = Object.prototype.toString.call(value).slice(8, -1).toLowerCase();
-
-  if (result === 'function' && /^class/i.test(value.toString())) {
-    return 'constructor';
-  }
-
-  return result;
-};
+export const typeOf = Helper.typeOf;
 
 /**
  * Check if a string value is json.
  */
-export const isJSON = (value: string): boolean => {
-  try {
-    JSON.parse(value);
-  } catch (e) {
-    return false;
-  }
-  return true;
-};
+export const isJSON = Helper.isJSON;
 
 /**
  * Convert a query string to an object.
  */
-export const queryStringToObject = (value: string): Object => {
-  const urlSearchParams = new URLSearchParams(value);
-  const entries = urlSearchParams.entries();
-  const result: Record<string, string> = {};
-  for (const [key, value] of entries) {
-    result[key] = value;
-  }
-  return result;
-};
+export const queryStringToObject = Helper.queryStringToObject;
 
 /**
  * String supporter.
@@ -83,6 +45,20 @@ export const _arr = (value: any[] | null | undefined = []): Arr => Arr.new(value
  */
 export const _obj = Obj;
 
-export const _col = <T>(items: T[] = []) => new Collection<T>(items);
+/**
+ * Create a collection instance from an array or object.
+ * If the input is an array, it will be passed directly to the Collection constructor.
+ * If the input is an object, Collection.wrap() will be called on it.
+ * If the input is null or undefined, an empty collection will be created.
+ * @param {T | T[] | null | undefined} items The items to create the collection from.
+ * @return {Collection<T>}
+ */
+export const _col = <T>(items: T | T[] = []) => {
+  if (Array.isArray(items)) {
+    return new Collection<T>(items);
+  }
+
+  return Collection.wrap(items);
+};
 
 export { Arr, Collection, Obj, Str, StringHelper };

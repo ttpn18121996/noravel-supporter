@@ -24,6 +24,34 @@ class Obj {
   }
 
   /**
+   * Compare two objects to determine if they are equal.
+   * @param {Object} obj1 The first object to compare.
+   * @param {Object} obj2 The second object to compare.
+   * @returns {boolean} True if the objects are equal, false if they are not.
+   */
+  static equals(obj1: { [key: string]: any }, obj2: { [key: string]: any }): boolean {
+    return JSON.stringify(obj1) === JSON.stringify(obj2);
+  }
+
+  /**
+   * Get all of the given object except for a specified object of keys.
+   * @param {Object} obj The object to get the item from
+   * @param {string|string[]} list List of keys to ignore
+   * @returns {Object}
+   */
+  static except(obj: { [key: string]: any } | null, list: string | string[]): Object {
+    if (!obj) return {};
+
+    return Object.keys(obj).reduce((pre, cur) => {
+      if ((typeOf(list) === 'string' && cur !== list) || (Array.isArray(list) && !list.includes(cur))) {
+        return { ...pre, [cur]: obj[cur] };
+      }
+
+      return { ...pre };
+    }, {});
+  }
+
+  /**
    * Get an item from an array using "dot" notation.
    * @param {Object} obj The object to get the item from.
    * @param {string} keys String containing the path to the item, separated by a "dot".
@@ -43,61 +71,6 @@ class Obj {
       return defaultValue !== undefined ? defaultValue : null;
     }
     return result;
-  }
-
-  /**
-   * Set an object item to a given value using "dot" notation.
-   * @param {Object} obj The object to set the item from
-   * @param {string} keys String containing the path to the item, separated by a "dot"
-   * @param {any} value Value to set
-   */
-  static set(obj: { [key: string]: any }, keys: string, value: any) {
-    const keyList = keys.split('.');
-    let currentObj = obj;
-    for (let i = 0; i < keyList.length - 1; i++) {
-      const key = keyList[i];
-      if (!currentObj[key] || typeof currentObj[key] !== 'object') {
-        currentObj[key] = {};
-      }
-      currentObj = currentObj[key];
-    }
-    currentObj[keyList[keyList.length - 1]] = value;
-  }
-
-  /**
-   * Get a subset of the items from the given object.
-   * @param {Object} obj The object to get the item from
-   * @param {string|string[]} list List of keys to get
-   * @returns {Object}
-   */
-  static only(obj: { [key: string]: any } | null, list: string | string[]): Object {
-    if (!obj) return {};
-
-    return Object.keys(obj).reduce((pre, cur: string) => {
-      if ((typeOf(list) === 'string' && cur === list) || (Array.isArray(list) && list.includes(cur))) {
-        return { ...pre, [cur]: obj[cur] };
-      }
-
-      return { ...pre };
-    }, {});
-  }
-
-  /**
-   * Get all of the given object except for a specified object of keys.
-   * @param {Object} obj The object to get the item from
-   * @param {string|string[]} list List of keys to ignore
-   * @returns {Object}
-   */
-  static except(obj: { [key: string]: any } | null, list: string | string[]): Object {
-    if (!obj) return {};
-
-    return Object.keys(obj).reduce((pre, cur) => {
-      if ((typeOf(list) === 'string' && cur !== list) || (Array.isArray(list) && !list.includes(cur))) {
-        return { ...pre, [cur]: obj[cur] };
-      }
-
-      return { ...pre };
-    }, {});
   }
 
   /**
@@ -122,6 +95,24 @@ class Obj {
   }
 
   /**
+   * Get a subset of the items from the given object.
+   * @param {Object} obj The object to get the item from
+   * @param {string|string[]} list List of keys to get
+   * @returns {Object}
+   */
+  static only(obj: { [key: string]: any } | null, list: string | string[]): Object {
+    if (!obj) return {};
+
+    return Object.keys(obj).reduce((pre, cur: string) => {
+      if ((typeOf(list) === 'string' && cur === list) || (Array.isArray(list) && list.includes(cur))) {
+        return { ...pre, [cur]: obj[cur] };
+      }
+
+      return { ...pre };
+    }, {});
+  }
+
+  /**
    * Run a map over each of the properties in the object.
    * @param {Object} obj The object to loop each property
    * @param {Function} callback
@@ -137,6 +128,34 @@ class Obj {
     }
 
     return result;
+  }
+
+  /**
+   * Clone the object into a new, non-existing instance.
+   * @param {Object} obj
+   * @returns {Object}
+   */
+  static replicate(obj: Object): Object {
+    return Object.assign(Object.create(Object.getPrototypeOf(obj)), obj);
+  }
+
+  /**
+   * Set an object item to a given value using "dot" notation.
+   * @param {Object} obj The object to set the item from
+   * @param {string} keys String containing the path to the item, separated by a "dot"
+   * @param {any} value Value to set
+   */
+  static set(obj: { [key: string]: any }, keys: string, value: any) {
+    const keyList = keys.split('.');
+    let currentObj = obj;
+    for (let i = 0; i < keyList.length - 1; i++) {
+      const key = keyList[i];
+      if (!currentObj[key] || typeof currentObj[key] !== 'object') {
+        currentObj[key] = {};
+      }
+      currentObj = currentObj[key];
+    }
+    currentObj[keyList[keyList.length - 1]] = value;
   }
 
   /**
@@ -168,15 +187,6 @@ class Obj {
     const result = urlSearchParams.toString();
 
     return empty(result) ? '' : `?${result}`;
-  }
-
-  /**
-   * Clone the object into a new, non-existing instance.
-   * @param {Object} obj
-   * @returns {Object}
-   */
-  static replicate(obj: Object): Object {
-    return Object.assign(Object.create(Object.getPrototypeOf(obj)), obj);
   }
 }
 
