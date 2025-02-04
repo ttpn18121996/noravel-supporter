@@ -255,10 +255,10 @@ export default class Collection<T> {
     let items = this.items;
 
     if (callback !== undefined) {
-      items = this.items.filter(callback);
+      items = items.filter(callback);
     }
 
-    return items[this.items.length - 1];
+    return items[items.length - 1];
   }
 
   /**
@@ -347,11 +347,11 @@ export default class Collection<T> {
    * @returns {Collection<unknown>} A new collection with the values plucked from the original array.
    */
   public pluck(key: string): Collection<unknown> {
-    const items = this.items
-      .map((item: T) => (typeof item === 'object' && item !== null ? Obj.get(item, key) : null))
-      .filter(item => item);
-
-    return new Collection(items);
+    return new Collection(
+      this.items
+        .map((item: T) => (typeof item === 'object' && item !== null ? Obj.get(item, key) : null))
+        .filter(item => item),
+    );
   }
 
   /**
