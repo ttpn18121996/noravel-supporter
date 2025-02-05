@@ -89,10 +89,14 @@ export default class Collection<T> {
   /**
    * Determines whether the collection contains a particular value.
    *
-   * @param {Function} callback A function that takes in a value, index and array and returns a boolean.
+   * @param {Function | unknown} callback A function that takes in a value, index and array and returns a boolean.
    * @returns {boolean}
    */
-  public contains(callback: (value: T, index: number, array: T[]) => unknown): boolean {
+  public contains(callback: (value: T, index: number, array: T[]) => unknown | unknown): boolean {
+    if (typeof callback !== 'function') {
+      return this.items.some((value: T) => value === callback);
+    }
+
     return this.items.some(callback);
   }
 
@@ -186,6 +190,13 @@ export default class Collection<T> {
     return undefined;
   }
 
+  /**
+   * "Paginate" the collection by slicing it into a smaller collection.
+   *
+   * @param {number} page The page number.
+   * @param {number} [perPage=10] The number of items per page.
+   * @returns {Collection<T>}
+   */
   public forPage(page: number, perPage: number = 10): Collection<T> {
     const start = (page - 1) * perPage;
     const end = start + perPage;
