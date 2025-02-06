@@ -358,6 +358,54 @@ test('it can splice an item from the collection', () => {
   expect(collection.all()).toEqual([1, 4, 5]);
 });
 
+test('it can split the items of the collection into a specified number of groups', () => {
+  const collection = _col().range(1, 5);
+  const actual = collection.split(2);
+  expect(actual.all()).toEqual([[1, 2, 3], [4, 5]]);
+});
+
+describe('it can sum the values of the collection', () => {
+  test('with a number collection', () => {
+    const collection = _col().range(1, 5);
+    const actual = collection.sum();
+    expect(actual).toEqual(15);
+  });
+
+  test('with an object collection', () => {
+    const collection = _col([
+      { id: 1, salary: 1000 },
+      { id: 2, salary: 2000 },
+      { id: 3, salary: 3000 },
+    ]);
+    const actual = collection.sum('salary');
+    expect(actual).toEqual(6000);
+  });
+
+  test('with an item in the collection that is an array', () => {
+    const collection = _col([
+      [1, 2, 3],
+      [4, 5, 6],
+      [7, 8, 9],
+    ]);
+    const actual = collection.sum();
+    expect(actual).toEqual(9);
+  });
+
+  test('with an item in the collection that is a string', () => {
+    const collection = _col(['John', 'Jane', 'Jame', 'John']);
+    const actual = collection.sum();
+    expect(actual).toEqual(4);
+  });
+});
+
+test('it can pass the collection to the given callback and return the collection', () => {
+  const collection = _col().range(1, 5);
+  const actual = collection.tap(value => {
+    expect(value.all()).toEqual([1, 2, 3, 4, 5]);
+  });
+  expect(actual.all()).toEqual([1, 2, 3, 4, 5]);
+});
+
 test('it can cast a collection to a json', () => {
   const collection = _col().range(1, 5);
   const actual = collection.toJson();
