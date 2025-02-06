@@ -657,12 +657,17 @@ console.log(_str('The quick brown fox jumps over the lazy dog').limit(20).get())
 
 ### \_str().random()
 
-Generate a more truly "random" string.
+Generate a more truly "random" string. The `includeSymbols` option includes the following characters:
+
+```text
+!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
+```
 
 ```js
 console.log(_str().random(20)); // 'kvyufaqbosqlcojacnqo'
 console.log(_str().random(20, { includeUppercase: true })); // 'KJqGfjKjccCjHnmmxyeM'
 console.log(_str().random(20, { includeNumbers: true })); // 'h372ysnmr71klxekb4fs'
+console.log(_str().random(20, { includeSymbols: true })); // '[-\\jb'p*w_i}@(;|t"zh'
 
 // full options
 const options = {

@@ -178,8 +178,8 @@ export default class Str {
    * Remove Vietnamese unicode characters from the string.
    * @returns {Str}
    */
-  public nonUnicode(value: string): Str {
-    this.value = StringHelper.nonUnicode(value);
+  public nonUnicode(): Str {
+    this.value = StringHelper.nonUnicode(this.value.toString());
 
     return this;
   }
@@ -200,7 +200,9 @@ export default class Str {
    * @returns {Str}
    */
   public kebab(): Str {
-    return this.snake('-');
+    this.value = StringHelper.kebab(this.toString());
+
+    return this;
   }
 
   /**

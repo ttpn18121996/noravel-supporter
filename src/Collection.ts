@@ -166,7 +166,11 @@ export default class Collection<T> {
    * @returns {Collection<T>}
    */
   public filter(callback: (value: T, index: number, array: T[]) => unknown): Collection<T> {
-    return new Collection(this.items.filter(callback));
+    if (callback !== undefined) {
+      return new Collection(this.items.filter(callback));
+    }
+
+    return new Collection(this.items.filter(item => item));
   }
 
   /**
@@ -337,13 +341,13 @@ export default class Collection<T> {
     let result = [];
 
     if (length < 0) {
-      result = Arr.fillItems(0, this.items.length - length - 1)
+      result = Arr.fillItems(0, Math.abs(this.items.length + length) - 1)
         .map(_ => char)
         .concat(<[]>this.items);
     } else {
       result = [...this.items];
 
-      while (this.items.length < length) {
+      while (result.length < length) {
         result.push(char as T);
       }
     }
@@ -352,7 +356,7 @@ export default class Collection<T> {
   }
 
   /**
-   * Pluck an array of values from an array.
+   * Pluck an array of values from the collection.
    *
    * @param {string} key The key name needs to be taken from another array.
    * @returns {Collection<unknown>} A new collection with the values plucked from the original array.
@@ -436,7 +440,7 @@ export default class Collection<T> {
    *
    * @returns {Collection<T>}
    */
-  public revert(): Collection<T> {
+  public reverse(): Collection<T> {
     return new Collection(this.items.reverse());
   }
 
@@ -566,10 +570,20 @@ export default class Collection<T> {
     return this;
   }
 
+  /**
+   * Return an array representation of the collection.
+   *
+   * @returns {T[]}
+   */
   public toArray(): T[] {
     return this.items;
   }
 
+  /**
+   * Return a JSON representation of the collection.
+   *
+   * @returns {string}
+   */
   public toJson(): string {
     return JSON.stringify(this.items);
   }
