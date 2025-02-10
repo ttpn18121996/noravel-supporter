@@ -25,21 +25,21 @@ class Obj {
 
   /**
    * Compare two objects to determine if they are equal.
-   * @param {Object} obj1 The first object to compare.
-   * @param {Object} obj2 The second object to compare.
+   * @param {Record<string, any>} obj1 The first object to compare.
+   * @param {Record<string, any>} obj2 The second object to compare.
    * @returns {boolean} True if the objects are equal, false if they are not.
    */
-  static equals(obj1: { [key: string]: any }, obj2: { [key: string]: any }): boolean {
+  static equals(obj1: Record<string, any>, obj2: Record<string, any>): boolean {
     return JSON.stringify(obj1) === JSON.stringify(obj2);
   }
 
   /**
    * Get all of the given object except for a specified object of keys.
-   * @param {Object} obj The object to get the item from
-   * @param {string|string[]} list List of keys to ignore
-   * @returns {Object}
+   * @param {Record<string, any> | null} obj The object to get the item from
+   * @param {string | string[]} list List of keys to ignore
+   * @returns {Record<string, any>}
    */
-  static except(obj: { [key: string]: any } | null, list: string | string[]): Object {
+  static except(obj: Record<string, any> | null, list: string | string[]): Record<string, any> {
     if (!obj) return {};
 
     return Object.keys(obj).reduce((pre, cur) => {
@@ -53,12 +53,12 @@ class Obj {
 
   /**
    * Get an item from an array using "dot" notation.
-   * @param {Object} obj The object to get the item from.
+   * @param {Record<string, any>} obj The object to get the item from.
    * @param {string} keys String containing the path to the item, separated by a "dot".
    * @param {any} defaultValue Default value returned if not found.
    * @returns {any} The value of the specified property.
    */
-  static get(obj: { [key: string]: any }, keys: string, defaultValue: any = null): any {
+  static get(obj: Record<string, any>, keys: string, defaultValue: any = null): any {
     let result = obj;
     keys.split('.').forEach(key => {
       if (!empty(key)) {
@@ -75,11 +75,11 @@ class Obj {
 
   /**
    * Deeply check whether the properties exist or not.
-   * @param {Object} obj The object to get the item from
+   * @param {Record<string, any>} obj The object to get the item from
    * @param {string} list List of keys to ignore
    * @returns {boolean}
    */
-  static has(obj: { [key: string]: any }, keys: string): boolean {
+  static has(obj: Record<string, any>, keys: string): boolean {
     let result = obj;
     for (const key of keys.split('.')) {
       if (!empty(key)) {
@@ -96,11 +96,11 @@ class Obj {
 
   /**
    * Get a subset of the items from the given object.
-   * @param {Object} obj The object to get the item from
+   * @param {Record<string, any> | null} obj The object to get the item from
    * @param {string|string[]} list List of keys to get
-   * @returns {Object}
+   * @returns {Record<string, any>}
    */
-  static only(obj: { [key: string]: any } | null, list: string | string[]): Object {
+  static only(obj: Record<string, any> | null, list: string | string[]): Record<string, any> {
     if (!obj) return {};
 
     return Object.keys(obj).reduce((pre, cur: string) => {
@@ -114,11 +114,11 @@ class Obj {
 
   /**
    * Run a map over each of the properties in the object.
-   * @param {Object} obj The object to loop each property
+   * @param {Record<string, any> | null} obj The object to loop each property
    * @param {Function} callback
    * @returns {any[]}
    */
-  static map(obj: { [key: string]: any } | null, callback: (value: any, key: string) => {}): any[] {
+  static map(obj: Record<string, any> | null, callback: (value: any, key: string) => {}): any[] {
     const result = [];
 
     if (!obj) return [];
@@ -132,20 +132,20 @@ class Obj {
 
   /**
    * Clone the object into a new, non-existing instance.
-   * @param {Object} obj
-   * @returns {Object}
+   * @param {Record<string, any>} obj
+   * @returns {Record<string, any>}
    */
-  static replicate(obj: Object): Object {
+  static replicate(obj: Record<string, any>): Record<string, any> {
     return Object.assign(Object.create(Object.getPrototypeOf(obj)), obj);
   }
 
   /**
    * Set an object item to a given value using "dot" notation.
-   * @param {Object} obj The object to set the item from
+   * @param {Record<string, any>} obj The object to set the item from
    * @param {string} keys String containing the path to the item, separated by a "dot"
    * @param {any} value Value to set
    */
-  static set(obj: { [key: string]: any }, keys: string, value: any) {
+  static set(obj: Record<string, any>, keys: string, value: any) {
     const keyList = keys.split('.');
     let currentObj = obj;
     for (let i = 0; i < keyList.length - 1; i++) {
@@ -160,10 +160,10 @@ class Obj {
 
   /**
    * Convert an object to a query string with each property.
-   * @param {Object} obj
+   * @param {Record<string, any> | null} obj
    * @returns {string}
    */
-  static toQueryString(obj: { [key: string]: any } | null): string {
+  static toQueryString(obj: Record<string, any> | null): string {
     const urlSearchParams = new URLSearchParams();
     for (const key in obj) {
       if (!isset(obj[key])) {

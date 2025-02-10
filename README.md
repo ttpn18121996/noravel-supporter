@@ -2,12 +2,20 @@
 
 This is a support library for Nam's projects.
 
+# Content
+
+- [\_obj](#_obj)
+- [\_arr](#_arr)
+- [\_str](#_str)
+- [\_col](#_col)
+- [helper](#helper)
+
 ## \_obj
 
 ```js
 const { _obj } = require('@noravel/supporter');
 
-# OR
+// OR
 
 import { _obj } from '@noravel/supporter';
 ```
@@ -195,7 +203,7 @@ JSON.stringify(user) === JSON.stringify(clone); // true
 ```js
 const { _arr } = require('@noravel/supporter');
 
-# OR
+// OR
 
 import { _arr } from '@noravel/supporter';
 ```
@@ -450,7 +458,7 @@ _arr()
 ```js
 const { _str } = require('@noravel/supporter');
 
-# OR
+// OR
 
 import { _str } from '@noravel/supporter';
 ```
@@ -462,7 +470,7 @@ Get the raw string value.
 ```js
 console.log(_str('Lorem ipsum').get()); // 'Lorem ipsum'
 
-# OR
+// OR
 
 console.log(_str('Lorem ipsum').toString()); // 'Lorem ipsum'
 ```
@@ -799,6 +807,109 @@ ttp
 */
 ```
 
+## \_col()
+
+Create a collection instance from an array or object.
+
+```js
+const { _col, Collection } = require('@noravel/supporter');
+
+// OR
+
+import { _col, Collection } from '@noravel/supporter';
+
+...
+
+console.log(_col([1, 2, 3]).all()); // [1, 2, 3]
+
+// OR
+
+console.log(new Collection([1, 2, 3]).all()); // [1, 2, 3]
+```
+
+You can create a new instance of the collection by passing a parameter that is not an array.
+
+```js
+console.log(_col('Hello world').all()); // ['Hello world']
+console.log(_col(123).all()); // [123]
+console.log(_col({ name: 'John', age: 30 }).all()); // [{ name: 'John', age: 30 }]
+```
+
+### \_col().all()
+
+Get all items in the collection as an array.
+
+```js
+console.log(_col().all()); // []
+console.log(_col([1, 2, 3, 4, 5]).all()); // [1, 2, 3, 4, 5]
+```
+
+### \_col().chunk()
+
+Split an array into chunks of the specified size.
+
+```js
+console.log(_col([1, 2, 3, 4, 5]).chunk(2).all()); // [[1, 2], [3, 4], [5]]
+```
+
+### \_col().collapse()
+
+Collapse an array of arrays into a single array.
+
+```js
+console.log(_col([[1, 2], [3, 4], [5]]).collapse().all()); // [1, 2, 3, 4, 5]
+```
+
+### \_col().collect()
+
+Get a shallow copy of this collection.
+
+```js
+console.log(_col([1, 2, 3, 4, 5]).collect().all()); // [1, 2, 3, 4, 5]
+```
+
+### \_col().concat()
+
+Concatenate the underlying array with the given array.
+
+```js
+console.log(_col([1, 2, 3]).concat([4, 5]).all()); // [1, 2, 3, 4, 5]
+
+// OR
+
+const collection1 = _col([1, 2, 3]);
+const collection2 = _col([4, 5]);
+console.log(collection1.concat(collection2).all()); // [1, 2, 3, 4, 5]
+```
+
+### \_col().contains()
+
+Check if a value is present in the collection.
+
+```js
+console.log(_col([1, 2, 3]).contains(2)); // true
+
+// OR
+
+console.log(_col([1, 2, 3]).contains(value => value === 3)); // true
+```
+
+### \_col().count()
+
+Get the number of items in the collection.
+
+```js
+console.log(_col([1, 2, 3]).count()); // 3
+```
+
+### \_col().diff()
+
+Get the difference of two collections.
+
+```js
+console.log(_col([1, 2, 3]).diff([2, 3, 4]).all()); // [1]
+```
+
 ## helper
 
 ### isset()
@@ -808,7 +919,7 @@ Determine if a variable is declared and is different than null.
 ```js
 const { isset } = require('@noravel/supporter');
 
-# OR
+// OR
 
 import { isset } from '@noravel/supporter';
 ```
@@ -827,7 +938,7 @@ Determine whether a variable is empty.
 ```js
 const { empty } = require('@noravel/supporter');
 
-# OR
+// OR
 
 import { empty } from '@noravel/supporter';
 ```
@@ -864,7 +975,7 @@ If you want to check the exact data type then typeOf will help you.
 ```js
 const { typeOf } = require('@noravel/supporter');
 
-# OR
+// OR
 
 import { typeOf } from '@noravel/supporter';
 ```
