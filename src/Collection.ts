@@ -110,6 +110,22 @@ export default class Collection<T> {
   }
 
   /**
+   * Cross join the given arrays.
+   *
+   * @param {...any[]} args The arrays to cross join
+   * @returns {Collection<unknown>}
+   * @chainable
+   */
+  public crossJoin(...args: any[]): Collection<unknown> {
+    return new Collection(
+      Arr.crossJoin(
+        this.items,
+        ...args.map(arg => (arg instanceof Collection ? arg.all() : Collection.wrap(arg).all())),
+      ),
+    );
+  }
+
+  /**
    * Get the items in the collection that are not present in the given items.
    *
    * @param {Collection<T>|unknown[]} items The items to compare against

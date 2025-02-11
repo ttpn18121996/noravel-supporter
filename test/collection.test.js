@@ -61,6 +61,23 @@ test('it can count the number of items in a collection', () => {
   expect(actual).toEqual(5);
 });
 
+test('it can cross join multiple collections', () => {
+  const collection1 = _col([1, 2]);
+  const collection2 = _col(['a', 'b']);
+  const collection3 = _col(['I', 'II']);
+  const actual = collection1.crossJoin(collection2, collection3);
+  expect(actual.all()).toEqual([
+    [1, 'a', 'I'],
+    [1, 'a', 'II'],
+    [1, 'b', 'I'],
+    [1, 'b', 'II'],
+    [2, 'a', 'I'],
+    [2, 'a', 'II'],
+    [2, 'b', 'I'],
+    [2, 'b', 'II'],
+  ]);
+});
+
 test('it can get items different from another collection', () => {
   const collection = _col().range(1, 5);
   const actual = collection.diff(_col().range(3, 5));
@@ -361,7 +378,10 @@ test('it can splice an item from the collection', () => {
 test('it can split the items of the collection into a specified number of groups', () => {
   const collection = _col().range(1, 5);
   const actual = collection.split(2);
-  expect(actual.all()).toEqual([[1, 2, 3], [4, 5]]);
+  expect(actual.all()).toEqual([
+    [1, 2, 3],
+    [4, 5],
+  ]);
 });
 
 describe('it can sum the values of the collection', () => {

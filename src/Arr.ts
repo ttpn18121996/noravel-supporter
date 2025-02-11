@@ -209,6 +209,10 @@ export default class Arr extends Array {
     return this.length === 0;
   }
 
+  static crossJoin(...args: any[][]): any[] {
+    return args.reduce((pre, cur) => pre.flatMap((item: any) => cur.map((i: any) => [...item, i])), [[]]);
+  }
+
   /**
    * Register a macro.
    * @param {string} name
