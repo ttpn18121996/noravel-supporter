@@ -1,4 +1,4 @@
-import { typeOf } from '.';
+import { Obj, typeOf } from '.';
 
 export default class Arr extends Array {
   constructor(...items: any[]) {
@@ -167,8 +167,14 @@ export default class Arr extends Array {
 
     if (key) {
       items = [...new Map(this.map(item => [item[key], item])).values()];
+    } else if (typeof this[0] === 'object') {
+      items = this.filter(
+        (item, index) =>
+          this.findIndex(other => Obj.equals(item as { [key: string]: any }, other as { [key: string]: any })) ===
+          index,
+      );
     } else {
-      items = this.filter((value, index, self) => self.indexOf(value) === index);
+      items = [...new Set(this)];
     }
 
     return Arr.new(items);

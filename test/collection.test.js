@@ -97,17 +97,38 @@ test('it can iterate items in the collection and call the given callback for eac
   expect(actual).toEqual([2, 4, 6]);
 });
 
-test('it can determine whether all elements in the collection satisfy a condition', () => {
-  const collection = _col().range(1, 5);
-  const actual = collection.every(value => value < 6);
-  expect(actual).toBeTruthy();
+describe('it can determine whether all elements in the collection satisfy a condition', () => {
+  test('with an empty collection', () => {
+    const collection = _col();
+    const actual = collection.every(value => value < 6);
+    expect(actual).toBeTruthy();
+  });
+
+  test('with a collection', () => {
+    const collection = _col().range(1, 5);
+    const actual = collection.every(value => value < 6);
+    expect(actual).toBeTruthy();
+  });
 });
 
 describe('it can filter a collection', () => {
   test('without a param', () => {
-    const collection = _col([1, 2, 3, 4, 5, null, false, undefined]);
+    const collection = _col([
+      0,
+      1,
+      2,
+      3,
+      null,
+      false,
+      '',
+      undefined,
+      [],
+      {},
+      { isEmpty: () => true },
+      { count: () => 0 },
+    ]);
     const actual = collection.filter();
-    expect(actual.all()).toEqual([1, 2, 3, 4, 5]);
+    expect(actual.all()).toEqual([1, 2, 3]);
   });
 
   test('with a param that is a function', () => {
@@ -242,11 +263,46 @@ describe('it can run a grouping map over the items', () => {
   });
 });
 
-test('it can merges the given items', () => {
-  const collection1 = _col().range(1, 5);
-  const collection2 = _col().range(6, 10);
-  const actual = collection1.merge(collection2);
-  expect(actual.all()).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+describe('it can merges the given items', () => {
+  test('with a number collection', () => {
+    const collection = _col().range(1, 5);
+    const actual = _col().range(5, 10);
+    actual.merge(collection);
+    expect(actual.all()).toEqual([5, 6, 7, 8, 9, 10, 1, 2, 3, 4]);
+  });
+
+  test('with a string collection', () => {
+    const collection = _col(['John', 'Jane', 'Jame']);
+    const actual = _col(['John', 'Bob']);
+    actual.merge(collection);
+    expect(actual.all()).toEqual(['John', 'Bob', 'Jane', 'Jame']);
+  });
+
+  test('with an object collection', () => {
+    const collection = _col([
+      { id: 1, name: 'John' },
+      { id: 2, name: 'Jane' },
+      { id: 3, name: 'Jame' },
+    ]);
+    const actual = _col([
+      { id: 2, name: 'Jane' },
+      { id: 4, name: 'Bob' },
+    ]);
+    actual.merge(collection);
+    expect(actual.all()).toEqual([
+      { id: 2, name: 'Jane' },
+      { id: 4, name: 'Bob' },
+      { id: 1, name: 'John' },
+      { id: 3, name: 'Jame' },
+    ]);
+  });
+
+  test('with am object collection', () => {
+    const collection = _col().range(1, 5);
+    const actual = _col().range(5, 10);
+    actual.merge(collection);
+    expect(actual.all()).toEqual([5, 6, 7, 8, 9, 10, 1, 2, 3, 4]);
+  });
 });
 
 describe('it can pad the collection with the given value', () => {

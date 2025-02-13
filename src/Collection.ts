@@ -1,5 +1,6 @@
 import Obj from './Obj';
 import Arr from './Arr';
+import Helper from './Support/Helper';
 
 export default class Collection<T> {
   private items: T[] = [];
@@ -72,7 +73,7 @@ export default class Collection<T> {
   }
 
   /**
-   * Concatenate the underlying array with the given array.
+   * Concatenate the underlying array with the given array or collection and return a new collection.
    *
    * @param {Collection<T>|unknown[]} items The array to concatenate with
    * @returns {Collection<T>}
@@ -186,7 +187,7 @@ export default class Collection<T> {
       return new Collection(this.items.filter(callback));
     }
 
-    return new Collection(this.items.filter(item => item));
+    return new Collection(this.items.filter(item => !Helper.empty(item)));
   }
 
   /**
@@ -340,7 +341,7 @@ export default class Collection<T> {
       items = items.all();
     }
 
-    this.items = this.items.concat(<[]>items);
+    this.items = Arr.new(this.items.concat(<[]>items)).unique();
 
     return this;
   }
@@ -611,22 +612,7 @@ export default class Collection<T> {
    * @returns {Collection<T>}
    */
   public unique(key?: string): Collection<T> {
-    let items: T[];
-
-    if (key) {
-      items = [...new Map(this.items.map(item => [item[key as keyof T], item])).values()];
-    } else if (typeof this.items[0] === 'object') {
-      items = this.items.filter(
-        (item: T, index) =>
-          this.items.findIndex((other: T) =>
-            Obj.equals(item as { [key: string]: any }, other as { [key: string]: any }),
-          ) === index,
-      );
-    } else {
-      items = [...new Set(this.items)];
-    }
-
-    return new Collection(items);
+    return new Collection(Arr.new(this.items).unique(key));
   }
 
   /**

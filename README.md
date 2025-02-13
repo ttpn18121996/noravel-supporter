@@ -4,13 +4,13 @@ This is a support library for Nam's projects.
 
 # Content
 
-- [\_obj](#_obj)
-- [\_arr](#_arr)
-- [\_str](#_str)
-- [\_col](#_col)
-- [helper](#helper)
+- [Object](#object)
+- [Array](#array)
+- [String](#string)
+- [Collection](#collection)
+- [Helper](#helper)
 
-## \_obj
+## Object
 
 ```js
 const { _obj } = require('@noravel/supporter');
@@ -198,7 +198,7 @@ const clone = _obj.replicate(user);
 JSON.stringify(user) === JSON.stringify(clone); // true
 ```
 
-## \_arr()
+## Array
 
 ```js
 const { _arr } = require('@noravel/supporter');
@@ -206,16 +206,6 @@ const { _arr } = require('@noravel/supporter');
 // OR
 
 import { _arr } from '@noravel/supporter';
-```
-
-### \_arr().collapse()
-
-Collapse the array into a single array.
-
-```js
-const data = [[1, 2, 3], [4, 5, 6, 7], [8, 9], [10]];
-
-console.log(_arr(data).collapse()); // [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 ```
 
 ### \_arr().chunk()
@@ -226,6 +216,16 @@ Chunk the array into chunks of the given size.
 const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 console.log(_arr(data).chunk(2)); // [[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]]
+```
+
+### \_arr().collapse()
+
+Collapse the array into a single array.
+
+```js
+const data = [[1, 2, 3], [4, 5, 6, 7], [8, 9], [10]];
+
+console.log(_arr(data).collapse()); // [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 ```
 
 ### \_arr().first()
@@ -453,7 +453,7 @@ _arr()
 // [1, 2, 3]
 ```
 
-## \_str()
+## String
 
 ```js
 const { _str } = require('@noravel/supporter');
@@ -807,7 +807,7 @@ ttp
 */
 ```
 
-## \_col()
+## Collection
 
 Create a collection instance from an array or object.
 
@@ -870,16 +870,10 @@ console.log(_col([1, 2, 3, 4, 5]).collect().all()); // [1, 2, 3, 4, 5]
 
 ### \_col().concat()
 
-Concatenate the underlying array with the given array.
+The `concat` method concatenates the underlying array with the given array or collection and return a new collection.
 
 ```js
-console.log(_col([1, 2, 3]).concat([4, 5]).all()); // [1, 2, 3, 4, 5]
-
-// OR
-
-const collection1 = _col([1, 2, 3]);
-const collection2 = _col([4, 5]);
-console.log(collection1.concat(collection2).all()); // [1, 2, 3, 4, 5]
+console.log(_col([1, 2, 3]).concat([3, 4, 5]).all()); // [1, 2, 3, 3, 4, 5]
 ```
 
 ### \_col().contains()
@@ -902,15 +896,261 @@ Get the number of items in the collection.
 console.log(_col([1, 2, 3]).count()); // 3
 ```
 
-### \_col().diff()
+### \_col().crossJoin()
 
-Get the difference of two collections.
+Cross join the given arrays.
 
 ```js
-console.log(_col([1, 2, 3]).diff([2, 3, 4]).all()); // [1]
+console.log(_col([1, 2]).crossJoin(['a', 'b']).all()); // [[1, 'a'], [1, 'b'], [2, 'a'], [2, 'b']]
+console.log(_col([1, 2]).crossJoin(['a', 'b'], ['I', 'II']).all());
+/*
+[
+  [1, 'a', 'I'],
+  [1, 'a', 'II'],
+  [1, 'b', 'I'],
+  [1, 'b', 'II'],
+  [2, 'a', 'I'],
+  [2, 'a', 'II'],
+  [2, 'b', 'I'],
+  [2, 'b', 'II']
+]
+*/
 ```
 
-## helper
+### \_col().diff()
+
+The `diff` method compares the collection against another collection or a plain array based on its values.
+This method will return the values in the original collection that are not present in the given collection or array.
+
+```js
+const collection = _col([1, 2, 3, 4, 5]);
+const diff = collection.diff([2, 4, 6, 8]);
+console.log(diff.all()); // [1, 3, 5]
+```
+
+### \_col().each()
+
+This will iterate over the items in the collection and pass each item to the given closure.
+
+```js
+_col([1, 2, 3]).each(value => console.log(value)); // 1 2 3
+```
+
+If you would like to stop iterating through the items, you may return false from your closure:
+
+```js
+_col([1, 2, 3, 4, 5]).each(value => {
+  if (value > 3) {
+    return false
+  };
+
+  console.log(value);
+}); // 1 2 3
+```
+
+### \_col().every()
+
+The `every` method may be used to verify that all elements of a collection pass a given truth test.
+
+```js
+console.log(_col([1, 2, 3, 4, 5]).every(value => value < 4)); // false
+```
+
+If the collection is empty, the `every` method will return `true`.
+
+```js
+console.log(_col().every(value => value < 4)); // true
+```
+
+### \_col().filter()
+
+The `filter` method filters the collection using the given callback,
+keeping only those items that pass a given truth test.
+
+```js
+const collection = _col([1, 2, 3, 4, 5]);
+const filtered = collection.filter(value => value < 4);
+console.log(filtered.all()); // [1, 2, 3]
+```
+
+If no callback is supplied, all entries of the collection that are equivalent to `false` will be returned.
+
+```js
+const collection = _col([0, 1, 2, 3, null, false, '', undefined, [], {}, { isEmpty: () => true }, { count: () => 0 }]);
+const filtered = collection.filter();
+console.log(filtered.all()); // [1, 2, 3]
+```
+
+### \_col().first()
+
+The `first` method returns the first element in the collection that passes a given truth test:
+
+```js
+console.log(_col([1, 2, 3, 4, 5]).first(value => value > 3)); // 4
+```
+
+You may also call the `first` method with no arguments to get the first element in the collection.
+If the collection is empty, it will return `undefined`.
+
+```js
+console.log(_col([1, 2, 3, 4, 5]).first()); // 1
+```
+
+### \_col().forPage()
+
+The `forPage` method returns a new collection containing the items that would be present on a given page number.
+The method accepts the page number as its first argument and the number of items to show per page as its second argument.
+By default, the number of items per page is 10.
+
+```js
+const collection = _col([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+const page = collection.forPage(2, 3);
+console.log(page.all()); // [4, 5, 6]
+```
+
+### \_col().groupBy()
+
+The `groupBy` method groups the collection's items by a given key.
+
+```js
+const collection = _col([
+  { name: 'John Doe', department: 'IT' },
+  { name: 'Jane Doe', department: 'IT' },
+  { name: 'Jame Doe', department: 'Sales' },
+]);
+const grouped = collection.groupBy('department');
+console.log(grouped.all());
+/*
+{
+  IT: [
+    { name: 'John Doe', department: 'IT' },
+    { name: 'Jane Doe', department: 'IT' },
+  ],
+  Sales: [
+    { name: 'Jame Doe', department: 'Sales' },
+  ],
+}
+*/
+```
+
+### \_col().intersect()
+
+The `intersect` method removes any values from the original collection that are not present in the given collection or array.
+
+```js
+const collection = _col([1, 2, 3, 4, 5]);
+const intersected = collection.intersect([1, 2, 4]);
+console.log(intersected.all()); // [1, 2, 4]
+```
+
+### \_col().isEmpty()
+
+The `isEmpty` method returns `true` if the collection is empty, `false` otherwise.
+
+```js
+const collection = _col([]);
+console.log(collection.isEmpty()); // true
+
+const collection2 = _col([1, 2, 3]);
+console.log(collection2.isEmpty()); // false
+```
+
+### \_col().isNotEmpty()
+
+The `isNotEmpty` method returns `true` if the collection is not empty, `false` otherwise.
+
+```js
+const collection = _col([1, 2, 3]);
+console.log(collection.isNotEmpty()); // true
+
+const collection2 = _col([]);
+console.log(collection2.isNotEmpty()); // false
+```
+
+### \_col().last()
+
+The `last` method returns the last element of the collection that passes a given truth test.
+
+```js
+const collection = _col([1, 2, 3]);
+console.log(collection.last(value => value < 3)); // 2
+```
+
+You may also call the `last` method with no arguments to get the last element in the collection.
+If the collection is empty, it will return `undefined`.
+
+```js
+const collection = _col([1, 2, 3]);
+console.log(collection.last()); // 3
+```
+
+### \_col().map()
+
+The `map` method iterates through the collection and passes each value to the given callback.
+The callback is free to modify the item and return it, thus forming a new collection of modified items.
+
+```js
+const collection = _col([1, 2, 3]);
+const multiplied = collection.map(value => value * 2);
+console.log(multiplied.all()); // [2, 4, 6]
+```
+
+### \_col().mapToGroups()
+
+The `mapToGroups` method groups the collection's items by the given closure.
+The closure should return an array with two elements, the first being the group key and the second being the item.
+If closure returns an array with number of elements different from 2, it will throw an error.
+
+```js
+const collection = _col([
+  { name: 'John', department: 'IT' },
+  { name: 'Jane', department: 'Marketing' },
+  { name: 'Bob', department: 'IT' }
+]);
+const grouped = collection.mapToGroups(item => [item.department, item.name]);
+console.log(grouped);
+/*
+{
+  IT: ['John', 'Bob'],
+  Marketing: ['Jane'],
+}
+*/
+```
+
+### \_col().merge()
+
+The `merge` method merges the given array or collection with the original collection.
+Unlike the `concat` method, this method only merges non-existent elements in the origin collection
+and modifies the original collection.
+
+```js
+const collection1 = _col([1, 2, 3]);
+const collection2 = _col([3, 4, 5]);
+collection1.merge(collection2);
+console.log(collection1.all()); // [1, 2, 3, 4, 5]
+
+const users1 = _col([
+  { id: 1, name: 'John' },
+  { id: 2, name: 'Jane' },
+  { id: 3, name: 'Jame' },
+]);
+const users2 = _col([
+  { id: 1, name: 'John' },
+  { id: 4, name: 'Bob' },
+]);
+users1.merge(users2);
+console.log(users1.all());
+/* 
+[
+  { id: 1, name: 'John' },
+  { id: 2, name: 'Jane' },
+  { id: 3, name: 'Jame' },
+  { id: 4, name: 'Bob' },
+]
+*/
+```
+
+## Helper
 
 ### isset()
 

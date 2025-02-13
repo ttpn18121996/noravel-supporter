@@ -9,9 +9,9 @@ export default class Helper {
     if (Array.isArray(value)) {
       return value.length === 0;
     } else if (Helper.typeOf(value) === 'object') {
-      if (value.hasOwnProperty('count') || typeof value.count === 'function') {
+      if (typeof value?.count === 'function') {
         return value.count() === 0;
-      } else if (value.hasOwnProperty('isEmpty') || typeof value.isEmpty === 'function') {
+      } else if (typeof value?.isEmpty === 'function') {
         return value.isEmpty();
       } else {
         return Object.keys(value).length === 0;
