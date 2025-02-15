@@ -373,6 +373,38 @@ test('it can get an random item from the collection', () => {
   expect(collection.contains(actual)).toBeTruthy();
 });
 
+describe('it can create a collection of numbers', () => {
+  test('with the specified length', () => {
+    const collection = _col().range(5);
+    expect(collection.all()).toEqual([1, 2, 3, 4, 5]);
+  });
+
+  test('with a negative length', () => {
+    const collection = _col().range(-3);
+    expect(collection.all()).toEqual([-3, -2, -1]);
+  });
+
+  test('with increasing values', () => {
+    const collection = _col().range(1, 5);
+    expect(collection.all()).toEqual([1, 2, 3, 4, 5]);
+  });
+
+  test('with decreasing values', () => {
+    const collection = _col().range(5, 1);
+    expect(collection.all()).toEqual([5, 4, 3, 2, 1]);
+  });
+
+  test('with step value', () => {
+    const collection = _col().range(1, 5, 2);
+    expect(collection.all()).toEqual([1, 3, 5]);
+  });
+
+  test('with start value equal end value', () => {
+    const collection = _col().range(1, 1);
+    expect(collection.all()).toEqual([1]);
+  });
+});
+
 test('it can reverse the collection', () => {
   const collection = _col().range(1, 5);
   const actual = collection.reverse();
@@ -424,10 +456,29 @@ describe('it can sort the collection', () => {
   });
 });
 
+describe('it can splice items from the collection', () => {
+  test('with one argument', () => {
+    const collection = _col().range(1, 5);
+    collection.splice(1);
+    expect(collection.all()).toEqual([1]);
+  });
+
+  test('with two arguments', () => {
+    const collection = _col().range(1, 5);
+    collection.splice(1, 2);
+    expect(collection.all()).toEqual([1, 4, 5]);
+  });
+
+  test('with negative arguments', () => {
+    const collection = _col().range(1, 5);
+    collection.splice(-2, 2);
+    expect(collection.all()).toEqual([1, 2, 3]);
+  });
+});
+
 test('it can splice an item from the collection', () => {
   const collection = _col().range(1, 5);
-  const actual = collection.splice(1, 2);
-  expect(actual.all()).toEqual([2, 3]);
+  collection.splice(1, 2);
   expect(collection.all()).toEqual([1, 4, 5]);
 });
 

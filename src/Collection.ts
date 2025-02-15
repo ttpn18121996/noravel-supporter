@@ -512,11 +512,14 @@ export default class Collection<T> {
    * Splices a portion of the collection.
    *
    * @param {number} start The index at which to start changing the array.
-   * @param {number} [deleteCount] The number of elements to remove.
-   * @returns {Collection<T>}
+   * @param {...*} args The elements to insert into the array at the start index.
+   * @returns {this}
+   * @chainable
    */
-  public splice(start: number, deleteCount?: number): Collection<T> {
-    return new Collection<T>(this.items.splice(start, deleteCount));
+  public splice(start: number, ...args: any[]): this {
+    this.items.splice(start, ...args);
+
+    return this;
   }
 
   /**

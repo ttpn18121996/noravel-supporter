@@ -936,7 +936,7 @@ This will iterate over the items in the collection and pass each item to the giv
 _col([1, 2, 3]).each(value => console.log(value)); // 1 2 3
 ```
 
-If you would like to stop iterating through the items, you may return false from your closure:
+If you would like to stop iterating through the items, you may return false from your closure.
 
 ```js
 _col([1, 2, 3, 4, 5]).each(value => {
@@ -983,7 +983,7 @@ console.log(filtered.all()); // [1, 2, 3]
 
 ### \_col().first()
 
-The `first` method returns the first element in the collection that passes a given truth test:
+The `first` method returns the first element in the collection that passes a given truth test.
 
 ```js
 console.log(_col([1, 2, 3, 4, 5]).first(value => value > 3)); // 4
@@ -1150,11 +1150,233 @@ console.log(users1.all());
 */
 ```
 
+### \_col().pad()
+
+The `pad` method will fill the array with the given value until the array reaches the specified size.
+To pad to the left, you should specify a negative size.
+No padding with take place if the absolute value of the size is less than or equal to the array length.
+
+```js
+const collection = _col([1, 2, 3]);
+let filtered = collection.pad(5, 0);
+console.log(filtered.all()); // [1, 2, 3, 0, 0]
+
+filtered = collection.pad(-5, 0);
+console.log(filtered.all()); // [0, 0, 1, 2, 3]
+```
+
+### \_col().pluck()
+
+The `pluck` method retrieves all of the values for a given key.
+
+```js
+const collection = _col([
+  { id: 1, name: 'John' },
+  { id: 2, name: 'Jane' },
+  { id: 3, name: 'Jame' },
+]);
+
+const names = collection.pluck('name');
+console.log(names); // ['John', 'Jane', 'Jame']
+```
+
+The `pluck` method also supports retrieving nested values using `dot` notation.
+
+```js
+const collection = _col([
+  { id: 1, department: { name: 'IT' } },
+  { id: 2, department: { name: 'Sales' } },
+  { id: 3, department: { name: 'Marketing' } },
+]);
+
+const names = collection.pluck('department.name');
+console.log(names); // ['IT', 'Sales', 'Marketing']
+```
+
+### \_col().pop()
+
+The `pop` method removes and returns the last item from the collection.
+
+```js
+const collection = _col([1, 2, 3, 4, 5]);
+const popped = collection.pop();
+console.log(popped); // 5
+console.log(collection.all()); // [1, 2, 3, 4]
+```
+
+You may pass an integer to the `pop` method to remove and return multiple items from the end of a collection.
+
+```js
+const collection = _col([1, 2, 3, 4, 5]);
+const popped = collection.pop(2);
+console.log(popped); // [5, 4]
+console.log(collection.all()); // [1, 2, 3]
+```
+
+### \_col().prepend()
+
+The `prepend` method will add the given value(s) to the beginning of the collection.
+
+```js
+const collection = _col([1, 2, 3]);
+collection.prepend(-1, 0);
+console.log(collection.all()); // [-1, 0, 1, 2, 3]
+```
+
+### \_col().push()
+
+The `push` method will add the given item to the end of the collection.
+
+```js
+const collection = _col([1, 2, 3]);
+collection.push(4);
+console.log(collection.all()); // [1, 2, 3, 4]
+```
+
+### \_col().random()
+
+The `random` method will return a random item from the collection.
+
+```js
+const collection = _col([1, 2, 3, 4, 5]);
+const random = collection.random();
+console.log(random); // 3 - (retrieved randomly)
+```
+
+### \_col().range()
+
+The `range` method returns a collection containing integers between the specified range.
+If the first argument is greater than the second, it will return a collection decreasing in value.
+
+```js
+const collection = _col.range(3, 5);
+console.log(collection.all()); // [3, 4, 5]
+
+const decreased = _col.range(5, 3);
+console.log(decreased.all()); // [5, 4, 3]
+```
+
+You may also pass a third argument to specify the step value.
+
+```js
+const collection = _col.range(1, 10, 2);
+console.log(collection.all()); // [1, 3, 5, 7, 9]
+```
+
+If the first argument is equal to the second, it will return a collection with 1 element.
+
+```js
+const collection = _col.range(3, 3);
+console.log(collection.all()); // [3]
+```
+
+### \_col().reverse()
+
+The `reverse` method returns a new collection with the items in reverse order.
+
+```js
+const collection = _col([1, 2, 3, 4, 5]);
+const reversed = collection.reverse();
+console.log(reversed.all()); // [5, 4, 3, 2, 1]
+```
+
+### \_col().shift()
+
+The `shift` method removes and returns the first element of the collection.
+
+```js
+const collection = _col([1, 2, 3, 4, 5]);
+const shifted = collection.shift();
+console.log(shifted); // 1
+console.log(collection.all()); // [2, 3, 4, 5]
+```
+
+### \_col().shuffle()
+
+The `shuffle` method returns a new collection with the items in random order.
+
+```js
+const collection = _col([1, 2, 3, 4, 5]);
+const shuffled = collection.shuffle();
+console.log(shuffled.all()); // [3, 5, 2, 4, 1] - (retrieved randomly)
+```
+
+### \_col().slice()
+
+The `slice` method returns a new collection containing a slice of the items in the original collection.
+
+```js
+const collection = _col([1, 2, 3, 4, 5]);
+const sliced = collection.slice(1, 4);
+console.log(sliced.all()); // [2, 3, 4]
+```
+
+### \_col().sort()
+
+The `sort` method returns a new collection with the items in sorted order.
+
+```js
+const collection = _col([3, 5, 2, 4, 1]);
+const sorted = collection.sort();
+console.log(sorted.all()); // [1, 2, 3, 4, 5]
+```
+
+You may also pass a closure to specify the sorting criteria.
+
+```js
+const collection = _col([
+  { id: 3, name: 'Jame Doe' },
+  { id: 1, name: 'John Doe' },
+  { id: 2, name: 'Jane Doe' },
+  { id: 4, name: 'John Smith' },
+]);
+const sorted = collection.sort((a, b) => a.id - b.id);
+console.log(sorted.all());
+/*
+[
+  { id: 1, name: 'John Doe' },
+  { id: 2, name: 'Jane Doe' },
+  { id: 3, name: 'Jame Doe' },
+  { id: 4, name: 'John Smith' },
+]
+*/
+```
+
+### \_col().splice()
+
+The `splice` method removes and gets the spliced items in the collection.
+
+```js
+const collection = _col([1, 2, 3, 4, 5, 6]);
+const split = collection.split(1, 2);
+console.log(split.all()); // [2, 3]
+console.log(collection.all()); // [1, 4, 5, 6]
+```
+
 ## Helper
+
+```js
+const { Helper } = require('@noravel/supporter');
+
+// OR
+
+import { Helper } from '@noravel/supporter';
+
+Helper.isset();
+Helper.empty();
+Helper.typeOf();
+Helper.isJSON();
+Helper.queryStringToObject();
+```
+
+Some shared functions will be exported separately, you can call them directly to use them without going through Helper.
 
 ### isset()
 
 Determine if a variable is declared and is different than null.
+
+```js
+const { isset } = require('@noravel/supporter');
 
 ```js
 const { isset } = require('@noravel/supporter');
