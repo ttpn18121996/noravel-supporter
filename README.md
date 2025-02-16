@@ -1347,15 +1347,20 @@ console.log(sorted.all());
 The `splice` method removes and gets the spliced items in the collection.
 
 ```js
-const collection = _col([1, 2, 3, 4, 5, 6]);
-const split = collection.split(1, 2);
-console.log(split.all()); // [2, 3]
-console.log(collection.all()); // [1, 4, 5, 6]
+const collection1 = _col([1, 2, 3, 4, 5, 6]);
+collection1.splice(1);
+console.log(collection1.all()); // [1]
+
+const collection2 = _col([1, 2, 3, 4, 5, 6]);
+collection2.splice(1, 2);
+console.log(collection2.all()); // [1, 4, 5, 6]
+
+const collection3 = _col(['Jan', 'Apr', 'May', 'Jun']);
+collection3.splice(1, 0, 'Feb', 'Mar');
+console.log(collection3.all()); // ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
 ```
 
 ## Helper
-
-```js
 const { Helper } = require('@noravel/supporter');
 
 // OR

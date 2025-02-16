@@ -474,6 +474,12 @@ describe('it can splice items from the collection', () => {
     collection.splice(-2, 2);
     expect(collection.all()).toEqual([1, 2, 3]);
   });
+
+  test('with remove and replace', () => {
+    const collection = _col(['Jan', 'Apr', 'May', 'Jun']);
+    collection.splice(1, 0, 'Feb', 'Mar');
+    expect(collection.all()).toEqual(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']);
+  });
 });
 
 test('it can splice an item from the collection', () => {
