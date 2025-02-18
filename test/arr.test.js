@@ -1,4 +1,4 @@
-const { _arr } = require('../dist');
+const { _arr, Arr } = require('../dist');
 
 test('it can collapse an array', () => {
   const arr = [
@@ -147,4 +147,13 @@ test('it can check for emptiness', () => {
 
 test('it can get a raw array value', () => {
   expect(_arr({ id: 1 })).toEqual([{ id: 1 }]);
+});
+
+test('it can register a custom macro', () => {
+  Arr.macro('custom', function () {
+    return this.concat(['custom']);
+  });
+
+  const actual = _arr(['hello']).custom();
+  expect(actual).toEqual(['hello', 'custom']);
 });
