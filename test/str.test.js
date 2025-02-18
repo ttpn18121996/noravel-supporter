@@ -1,4 +1,4 @@
-const { _str } = require('../dist');
+const { _str, Str } = require('../dist');
 
 test('it can get string length', () => {
   expect(_str('Nam').length).toEqual(3);
@@ -272,4 +272,13 @@ describe('it can be cast to string type', () => {
       return 'this is a function';
     }`);
   });
+});
+
+test('it can register a custom macro', () => {
+  Str.macro('custom', () => {
+    return 'custom';
+  });
+
+  const actual = _str('hello').custom();
+  expect(actual).toEqual('custom');
 });
