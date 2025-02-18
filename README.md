@@ -1360,7 +1360,128 @@ collection3.splice(1, 0, 'Feb', 'Mar');
 console.log(collection3.all()); // ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
 ```
 
+#### \_col().split()
+
+The `split` method breaks a collection into the given number of groups,
+filling non-terminal groups completely before allocating the remainder to the final group.
+
+```js
+const collection = _col([1, 2, 3, 4, 5]);
+const groups = collection.split();
+console.log(groups.all()); // [[1, 2], [3, 4], [5]]
+```
+
+### \_col().sum()
+
+The `sum` method returns the sum of the items in the collection.
+
+```js
+const collection = _col([1, 2, 3, 4, 5]);
+const sum = collection.sum();
+console.log(sum); // 15
+```
+
+If the item of the collection is an array, the sum of the length of the array is returned.
+
+```js
+const collection = _col([[1, 2], [3, 4], [5]]);
+const sum = collection.sum();
+console.log(sum); // 5
+```
+
+If the item of the collection is an object,
+you should pass a key to the `sum` method to calculate the sum of the values of that key.
+
+```js
+const collection = _col([{ id: 1, name: 'John' }, { id: 2, name: 'Jane' }]);
+const sum = collection.sum('id');
+console.log(sum); // 3
+```
+
+### \_col().tap()
+
+The `tap` method passes the collection to the given callback,
+allowing you to `tap` into the collection at a specific point and do something with the items while not affecting
+the collection itself.
+The collection is then returned bt the `tap` method.
+
+```js
+const shifted = _col([2, 4, 3, 1, 5])
+  .sort()
+  .tap(function (collection) {
+    collection.dump(); // [1, 2, 3, 4, 5]
+  })
+  .shift();
+console.log(shifted); // 1
+```
+
+### \_col().toArray()
+
+The `toArray` method returns all items in the collection as a plain array.
+If the item of the collection is an instance of the object has a `toArray` method,
+the `toArray` method will be called recursively.
+
+```js
+const collection = _col([
+  _col().range(1, 5),
+  _col().range(6, 10),
+]);
+const toArray = collection.toArray();
+const all = collection.all();
+console.log(toArray); // [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]]
+console.log(all);
+/*
+[
+  Collection { items: [ 1, 2, 3, 4, 5 ] },
+  Collection { items: [ 6, 7, 8, 9, 10 ] }
+]
+*/
+```
+
+### \_col().toJson()
+
+The `toJson` method returns all items in the collection as a JSON string.
+
+```js
+const collection = _col([1, 2, 3, 4, 5]);
+const json = collection.toJson();
+console.log(json); // "[1,2,3,4,5]"
+```
+
+### \_col().unique()
+
+The `unique` method returns all of the unique items in the collection.
+
+```js
+const collection = _col([1, 2, 3, 4, 5, 1, 2]);
+const unique = collection.unique();
+console.log(unique); // [1, 2, 3, 4, 5]
+```
+
+If the item of the collection is an object, you should specify the key to be checked.
+
+```js
+const collection = _col([{ id: 1, name: 'John' }, { id: 2, name: 'Jane' }, { id: 1, name: 'John' }]);
+const unique = collection.unique('id');
+console.log(unique); // [{ id: 1, name: 'John' }, { id: 2, name: 'Jane' }]
+```
+
+### \_col().when()
+
+The `when` method method will execute the given callback when the first argument given to the method evaluates to `true`.
+The collection instance and the first argument given to the `when` method will be provided to the callback.
+
+```js
+const collection = _col([1, 2, 3, 4, 5]);
+collection.when(true, (collection, value) => {
+  return collection.push(6);
+});
+console.log(collection.all()); // [2, 4, 6, 8, 10]
+```
+
 ## Helper
+
+```js
 const { Helper } = require('@noravel/supporter');
 
 // OR
@@ -1379,9 +1500,6 @@ Some shared functions will be exported separately, you can call them directly to
 ### isset()
 
 Determine if a variable is declared and is different than null.
-
-```js
-const { isset } = require('@noravel/supporter');
 
 ```js
 const { isset } = require('@noravel/supporter');

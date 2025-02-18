@@ -535,13 +535,29 @@ test('it can pass the collection to the given callback and return the collection
   const collection = _col().range(1, 5);
   const actual = collection.tap(value => {
     expect(value.all()).toEqual([1, 2, 3, 4, 5]);
+    value.dump();
   });
   expect(actual.all()).toEqual([1, 2, 3, 4, 5]);
+});
+
+test('it can cast a collection to an array', () => {
+  const collection = _col([
+    _col().range(1, 5),
+    _col().range(6, 10),
+  ]);
+  const actual = collection.toArray();
+  expect(actual).toEqual([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]]);
 });
 
 test('it can cast a collection to a json', () => {
   const collection = _col().range(1, 5);
   const actual = collection.toJson();
+  expect(actual).toEqual('[1,2,3,4,5]');
+});
+
+test('it can cast a collection to a string', () => {
+  const collection = _col().range(1, 5);
+  const actual = collection.toString();
   expect(actual).toEqual('[1,2,3,4,5]');
 });
 

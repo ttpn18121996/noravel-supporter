@@ -15,7 +15,7 @@ export default class Collection<T> {
    * @returns {T[]} the underlying array
    */
   public all(): T[] {
-    return this.toArray();
+    return this.items;
   }
 
   /**
@@ -593,10 +593,16 @@ export default class Collection<T> {
   /**
    * Return an array representation of the collection.
    *
-   * @returns {T[]}
+   * @returns {any[]}
    */
-  public toArray(): T[] {
-    return this.items;
+  public toArray(): any[] {
+    return this.map((item: any) => {
+      if (typeof item === 'object' && item !== null && typeof item?.toArray === 'function') {
+        return item.toArray();
+      }
+
+      return item;
+    }).all();
   }
 
   /**
@@ -606,6 +612,15 @@ export default class Collection<T> {
    */
   public toJson(): string {
     return JSON.stringify(this.items);
+  }
+
+  /**
+   * An alias of toJson method.
+   *
+   * @returns {string}
+   */
+  public toString(): string {
+    return this.toJson();
   }
 
   /**
