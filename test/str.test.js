@@ -1,31 +1,67 @@
-const { _str } = require('../dist');
+const { _str, Str } = require('../dist');
 
 test('it can get string length', () => {
-  expect(_str('Nam').length()).toEqual(3);
+  expect(_str('Nam').length).toEqual(3);
 });
 
-test('it can get the remainder of the string after the first occurrence of a certain value', () => {
-  expect(_str('This is my name').after(' ').get()).toEqual('is my name');
+describe('it can get the remainder of the string after the first occurrence of a certain value', () => {
+  test('with an empty string as a parameter', () => {
+    expect(_str('This is my name').after('').get()).toEqual('This is my name');
+  });
+
+  test('with a string as a parameter', () => {
+    expect(_str('This is my name').after(' ').get()).toEqual('is my name');
+  });
 });
 
-test('it can get the remainder of the string after the last occurrence of a certain value', () => {
-  expect(_str('/path/to/filename.extension').afterLast('/').get()).toEqual('filename.extension');
+describe('it can get the remainder of the string after the last occurrence of a certain value', () => {
+  test('with an empty string as a parameter', () => {
+    expect(_str('/path/to/filename.extension').afterLast('').get()).toEqual('/path/to/filename.extension');
+  });
+
+  test('with a string as a parameter', () => {
+    expect(_str('/path/to/filename.extension').afterLast('/').get()).toEqual('filename.extension');
+  });
 });
 
-test('it can get the portion of a string before the first occurrence of a given value', () => {
-  expect(_str('This is my name').before(' ').get()).toEqual('This');
+describe('it can get the portion of a string before the first occurrence of a given value', () => {
+  test('with an empty string as a parameter', () => {
+    expect(_str('This is my name').before('').get()).toEqual('This is my name');
+  });
+
+  test('with a string as a parameter', () => {
+    expect(_str('This is my name').before(' ').get()).toEqual('This');
+  });
 });
 
-test('it can get the portion of a string before the last occurrence of a given value', () => {
-  expect(_str('This is my name').beforeLast(' ').get()).toEqual('This is my');
+describe('it can get the portion of a string before the last occurrence of a given value', () => {
+  test('with an empty string as a parameter', () => {
+    expect(_str('This is my name').beforeLast('').get()).toEqual('This is my name');
+  });
+
+  test('with a string as a parameter', () => {
+    expect(_str('This is my name').beforeLast(' ').get()).toEqual('This is my');
+  });
 });
 
-test('it can get the portion of a string between two given values', () => {
-  expect(_str('This is my name').between('This', 'name').get()).toEqual(' is my ');
+describe('it can get the portion of a string between two given values', () => {
+  test('with an empty string as a parameter', () => {
+    expect(_str('This is my name').between('', '').get()).toEqual('This is my name');
+  });
+
+  test('with a string as a parameter', () => {
+    expect(_str('This is my name').between('This', 'name').get()).toEqual(' is my ');
+  });
 });
 
-test('it can get the smallest possible portion of a string between two given values', () => {
-  expect(_str('[a] bc [d]').betweenFirst('[', ']').get()).toEqual('a');
+describe('it can get the smallest possible portion of a string between two given values', () => {
+  test('with an empty string as a parameter', () => {
+    expect(_str('[a] bc [d]').betweenFirst('', '').get()).toEqual('[a] bc [d]');
+  });
+
+  test('with a string as a parameter', () => {
+    expect(_str('[a] bc [d]').betweenFirst('[', ']').get()).toEqual('a');
+  });
 });
 
 describe('it can binds the values ​​to the given string', () => {
@@ -93,7 +129,7 @@ describe('it can convert the given value', () => {
   });
 
   test('into a value with escaped Vietnamese characters', () => {
-    expect(_str('Trịnh Trần Phương Nam').upper().get()).toEqual('TRỊNH TRẦN PHƯƠNG NAM');
+    expect(_str('Trịnh Trần Phương Nam').nonUnicode().get()).toEqual('Trinh Tran Phuong Nam');
   });
 
   test('to snake case', () => {
@@ -134,7 +170,7 @@ describe('it can generate a random string', () => {
 
   test('with symbols', () => {
     const actual = _str().random(16, { includeSymbols: true });
-    expect(/[\!-\/]/.test(actual)).toBeTruthy();
+    expect(/[\!-\/\:-\@\[-\`\{-\~]/.test(actual)).toBeTruthy();
   });
 });
 
@@ -194,7 +230,7 @@ test('it can pads a given value in front of a given string until the given lengt
   const actual = _str(email)
     .before('@')
     .slice(-3)
-    .padStart(_str(email).before('@').length(), '*')
+    .padStart(_str(email).before('@').length, '*')
     .append(_str(email).after('@').prepend('@').get())
     .get();
 
@@ -208,32 +244,41 @@ test('it can pads a given value behind a given string until the given length is 
 
 describe('it can be cast to string type', () => {
   test('with an object', () => {
-    expect(_str().caseString({})).toEqual('[object Object]');
+    expect(_str({}).toString()).toEqual('[object Object]');
   });
 
   test('with an object has toString method', () => {
-    expect(_str().caseString({ toString: () => 'This is an object' })).toEqual('This is an object');
+    expect(_str({ toString: () => 'This is an object' }).toString()).toEqual('This is an object');
   });
 
   test('with an array', () => {
-    expect(_str().caseString([1, 2, 3])).toEqual('1,2,3');
+    expect(_str([1, 2, 3]).toString()).toEqual('1,2,3');
   });
 
   test('with Not a Number', () => {
-    expect(_str().caseString(NaN)).toEqual('NaN');
+    expect(_str(NaN).toString()).toEqual('NaN');
   });
 
   test('with an arrow function', () => {
-    expect(_str().caseString(() => {})).toEqual('() => {}');
+    expect(_str(() => {}).toString()).toEqual('() => {}');
   });
 
   test('with a function', () => {
     expect(
-      _str().caseString(function () {
+      _str(function () {
         return 'this is a function';
-      }),
+      }).toString(),
     ).toEqual(`function () {
       return 'this is a function';
     }`);
   });
+});
+
+test('it can register a custom macro', () => {
+  Str.macro('custom', () => {
+    return 'custom';
+  });
+
+  const actual = _str('hello').custom();
+  expect(actual).toEqual('custom');
 });
