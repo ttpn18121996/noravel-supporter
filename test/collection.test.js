@@ -541,12 +541,12 @@ test('it can pass the collection to the given callback and return the collection
 });
 
 test('it can cast a collection to an array', () => {
-  const collection = _col([
-    _col().range(1, 5),
-    _col().range(6, 10),
-  ]);
+  const collection = _col([_col().range(1, 5), _col().range(6, 10)]);
   const actual = collection.toArray();
-  expect(actual).toEqual([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]]);
+  expect(actual).toEqual([
+    [1, 2, 3, 4, 5],
+    [6, 7, 8, 9, 10],
+  ]);
 });
 
 test('it can cast a collection to a json', () => {
