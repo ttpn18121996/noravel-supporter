@@ -673,15 +673,15 @@ Generate a more truly "random" string. The `includeSymbols` option includes the 
 
 ```js
 console.log(_str().random(20)); // 'kvyufaqbosqlcojacnqo'
-console.log(_str().random(20, { includeUppercase: true })); // 'KJqGfjKjccCjHnmmxyeM'
-console.log(_str().random(20, { includeNumbers: true })); // 'h372ysnmr71klxekb4fs'
-console.log(_str().random(20, { includeSymbols: true })); // '[-\\jb'p*w_i}@(;|t"zh'
+console.log(_str().random(20, { uppercase: true })); // 'KJqGfjKjccCjHnmmxyeM'
+console.log(_str().random(20, { numbers: true })); // 'h372ysnmr71klxekb4fs'
+console.log(_str().random(20, { symbols: true })); // '[-\\jb'p*w_i}@(;|t"zh'
 
 // full options
 const options = {
-  includeUppercase: true,
-  includeNumbers: true,
-  includeSymbols: true,
+  uppercase: true,
+  numbers: true,
+  symbols: true,
 };
 const password = _str().random(20, options);
 

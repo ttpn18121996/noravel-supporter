@@ -1,6 +1,7 @@
 import StringHelper, { RandomOptions } from './Support/StringHelper';
+import { Stringable } from './types';
 
-export default class Str {
+export default class Str implements Stringable {
   public value: String;
 
   public constructor(value: any) {
