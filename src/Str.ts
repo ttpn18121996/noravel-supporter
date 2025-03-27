@@ -219,11 +219,11 @@ export default class Str implements Stringable {
 
   /**
    * Replace the given value in the given string.
-   * @param {{[Symbol.replace](string: string, replaceValue: string): string;}} regexp
+   * @param {string | RegExp} regexp
    * @param {string} replacer
    * @returns {this}
    */
-  public replace(regexp: { [Symbol.replace](string: string, replaceValue: string): string }, replacer: string): this {
+  public replace(regexp: string | RegExp, replacer: string): this {
     this.value = this.value.replace(regexp, replacer);
 
     return this;
