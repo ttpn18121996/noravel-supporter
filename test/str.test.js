@@ -184,12 +184,18 @@ test('it can randomly shuffle a string', () => {
   expect(shuffled2).not.toEqual(origin);
 });
 
-test('it can replace the given value in the given string', () => {
-  expect(
-    _str('Hello everyone')
-      .replace(/^Hello/, 'Hi')
-      .get(),
-  ).toEqual('Hi everyone');
+describe('it can replace the given value in the given string', () => {
+  test('with a RegExp', () => {
+    expect(
+      _str('Hello everyone')
+        .replace(/^Hello/, 'Hi')
+        .get(),
+    ).toEqual('Hi everyone');
+  });
+
+  test('with a string', () => {
+    expect(_str('Hello everyone').replace('Hello', 'Hi').get()).toEqual('Hi everyone');
+  });
 });
 
 test('it can replace the given value in the given string from a specific position', () => {
