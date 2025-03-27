@@ -1,8 +1,9 @@
 import Obj from './Obj';
 import Arr from './Arr';
 import Helper from './Support/Helper';
+import { Arrayable, Jsonable, Stringable } from './types';
 
-export default class Collection<T> {
+export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonable, Stringable {
   private items: T[] = [];
 
   public constructor(items: T[] = []) {
@@ -670,5 +671,9 @@ export default class Collection<T> {
     }
 
     return new Collection(item);
+  }
+
+  [Symbol.iterator](): Iterator<T> {
+    return this.items.values();
   }
 }

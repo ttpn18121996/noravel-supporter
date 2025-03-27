@@ -633,3 +633,10 @@ test('it can create a new collection with the param is not an array', () => {
   const actual = collection.all();
   expect(actual).toEqual([1]);
 });
+
+test('it is an iterator', () => {
+  const collection = _col().range(1, 5);
+  for (const item of collection) {
+    expect(collection.contains(item)).toBeTruthy();
+  }
+});

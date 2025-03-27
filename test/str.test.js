@@ -159,17 +159,17 @@ describe('it can generate a random string', () => {
   });
 
   test('with capital letters', () => {
-    const actual = _str().random(16, { includeUppercase: true });
+    const actual = _str().random(16, { uppercase: true });
     expect(/[A-Z]/.test(actual)).toBeTruthy();
   });
 
   test('with digits', () => {
-    const actual = _str().random(16, { includeNumbers: true });
+    const actual = _str().random(16, { numbers: true });
     expect(/[0-9]/.test(actual)).toBeTruthy();
   });
 
   test('with symbols', () => {
-    const actual = _str().random(16, { includeSymbols: true });
+    const actual = _str().random(16, { symbols: true });
     expect(/[\!-\/\:-\@\[-\`\{-\~]/.test(actual)).toBeTruthy();
   });
 });
@@ -184,12 +184,18 @@ test('it can randomly shuffle a string', () => {
   expect(shuffled2).not.toEqual(origin);
 });
 
-test('it can replace the given value in the given string', () => {
-  expect(
-    _str('Hello everyone')
-      .replace(/^Hello/, 'Hi')
-      .get(),
-  ).toEqual('Hi everyone');
+describe('it can replace the given value in the given string', () => {
+  test('with a RegExp', () => {
+    expect(
+      _str('Hello everyone')
+        .replace(/^Hello/, 'Hi')
+        .get(),
+    ).toEqual('Hi everyone');
+  });
+
+  test('with a string', () => {
+    expect(_str('Hello everyone').replace('Hello', 'Hi').get()).toEqual('Hi everyone');
+  });
 });
 
 test('it can replace the given value in the given string from a specific position', () => {

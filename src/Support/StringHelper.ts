@@ -1,18 +1,11 @@
-import { typeOf } from '..';
+import { Arr } from '..';
+import Helper from './Helper';
 
 export type RandomOptions = {
-  includeUppercase?: boolean;
-  includeNumbers?: boolean;
-  includeSymbols?: boolean;
+  uppercase?: boolean;
+  numbers?: boolean;
+  symbols?: boolean;
 };
-
-function arrayFromLowToHigh(low: number, high: number) {
-  let result: number[] = [];
-  for (let i = low; i <= high; i++) {
-    result.push(i);
-  }
-  return result;
-}
 
 export default class StringHelper {
   /**
@@ -111,7 +104,7 @@ export default class StringHelper {
       for (let i = 0; i < args[0].length; i++) {
         valueBound = valueBound.replace(/\{(\d+)\}/, args[0][i]);
       }
-    } else if (typeOf(args[0]) === 'object') {
+    } else if (Helper.typeOf(args[0]) === 'object') {
       const params = args[0];
       const matches = valueBound.match(/\{[a-zA-Z0-9_\-]+\}/g)?.map(m => m.replace(/^\{/, '').replace(/\}$/, ''));
       if (matches) {
@@ -126,7 +119,7 @@ export default class StringHelper {
       }
     } else {
       valueBound = valueBound.replace(/{(\d+)}/g, (match, number) =>
-        typeof args[number] != 'undefined' ? args[number] : match,
+        Helper.typeOf(args[number]) != 'undefined' ? args[number] : match,
       );
     }
 
@@ -239,16 +232,16 @@ export default class StringHelper {
    * @returns {string}
    */
   static random(length = 16, options: RandomOptions = {}): string {
-    const UPPERCASE_CHAR_CODES = arrayFromLowToHigh(65, 90);
-    const LOWCASE_CHAR_CODES = arrayFromLowToHigh(97, 122);
-    const NUMBER_CHAR_CODES = arrayFromLowToHigh(48, 57);
-    const SYMBOL_CHAR_CODES = arrayFromLowToHigh(33, 47).concat(
-      arrayFromLowToHigh(58, 64).concat(arrayFromLowToHigh(91, 96).concat(arrayFromLowToHigh(123, 126))),
+    const UPPERCASE_CHAR_CODES = Arr.fillItems(65, 90);
+    const LOWCASE_CHAR_CODES = Arr.fillItems(97, 122);
+    const NUMBER_CHAR_CODES = Arr.fillItems(48, 57);
+    const SYMBOL_CHAR_CODES = Arr.fillItems(33, 47).concat(
+      Arr.fillItems(58, 64).concat(Arr.fillItems(91, 96).concat(Arr.fillItems(123, 126))),
     );
     let charCodes = LOWCASE_CHAR_CODES;
-    if (options.includeUppercase) charCodes = charCodes.concat(UPPERCASE_CHAR_CODES);
-    if (options.includeNumbers) charCodes = charCodes.concat(NUMBER_CHAR_CODES);
-    if (options.includeSymbols) charCodes = charCodes.concat(SYMBOL_CHAR_CODES);
+    if (options.uppercase) charCodes = charCodes.concat(UPPERCASE_CHAR_CODES);
+    if (options.numbers) charCodes = charCodes.concat(NUMBER_CHAR_CODES);
+    if (options.symbols) charCodes = charCodes.concat(SYMBOL_CHAR_CODES);
     const result = [];
     for (let i = 0; i < length; i++) {
       const character = charCodes[Math.floor(Math.random() * charCodes.length)];
