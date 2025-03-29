@@ -16,6 +16,11 @@ export const isset = Helper.isset;
 export const empty = Helper.empty;
 
 /**
+ * Returns an array of items from the given value.
+ */
+export const getArray = Helper.getArrayableItems;
+
+/**
  * Check the exact data type of a certain value.
  */
 export const typeOf = Helper.typeOf;

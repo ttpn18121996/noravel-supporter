@@ -1,3 +1,5 @@
+import Collection from '../Collection';
+
 export default class Helper {
   /**
    * Check if a certain value is empty or not.
@@ -19,6 +21,29 @@ export default class Helper {
     }
 
     return value === undefined || value === null || value === false || value === '' || value === 0;
+  }
+
+  /**
+   * Returns an array of items from the given value.
+   *
+   * @param {any} items The value to convert to an array.
+   * @returns {unknown[]} An array of items.
+   */
+  static getArrayableItems(items: any): unknown[] {
+    if (Array.isArray(items)) {
+      return items;
+    } else if (items instanceof Collection) {
+      return items.all();
+    } else if (
+      Helper.typeOf(items) === 'object' &&
+      typeof (items as { toArray: () => unknown[] })?.toArray === 'function'
+    ) {
+      return (items as { toArray: () => unknown[] }).toArray();
+    } else if (Helper.typeOf(items) === 'string' && Helper.isJSON(items as string)) {
+      return JSON.parse(items as string);
+    }
+
+    return [items];
   }
 
   /**

@@ -1,4 +1,4 @@
-const { isset, empty, typeOf, isJSON, queryStringToObject } = require('../dist');
+const { _col, isset, empty, typeOf, isJSON, queryStringToObject, getArray } = require('../dist');
 
 describe('it is set', () => {
   test('with value is not undefined', () => {
@@ -50,6 +50,35 @@ describe('it is empty', () => {
     expect(empty(a)).toBeTruthy();
     expect(empty(b)).toBeTruthy();
     expect(empty(c)).toBeTruthy();
+  });
+});
+
+describe('it can be convert to array', () => {
+  test('with a string', () => {
+    expect(getArray('Nam')).toEqual(['Nam']);
+  });
+
+  test('with a number', () => {
+    expect(getArray(1)).toEqual([1]);
+  });
+
+  test('with a collection', () => {
+    const collection = _col([1, 2, 3]);
+
+    expect(getArray(collection)).toEqual([1, 2, 3]);
+  });
+
+  test('with an array', () => {
+    expect(getArray([1, 2, 3])).toEqual([1, 2, 3]);
+  });
+
+  test('with an arrayable', () => {
+    const arrayable = { toArray: () => [1, 2, 3] };
+    expect(getArray(arrayable)).toEqual([1, 2, 3]);
+  });
+
+  test('with a json', () => {
+    expect(getArray('[1,2,3]')).toEqual([1, 2, 3]);
   });
 });
 
