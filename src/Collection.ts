@@ -666,9 +666,7 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
    * @returns {Collection<unknown>}
    */
   static wrap(item: any): Collection<unknown> {
-    if (!Array.isArray(item)) {
-      item = [item];
-    }
+    item = Helper.getArrayableItems(item);
 
     return new Collection(item);
   }
