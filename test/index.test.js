@@ -1,4 +1,4 @@
-const { _col, isset, empty, typeOf, isJSON, queryStringToObject, getArray } = require('../dist');
+const { _col, isset, empty, typeOf, isJSON, queryStringToObject, getArray, isConstructor } = require('../dist');
 
 describe('it is set', () => {
   test('with value is not undefined', () => {
@@ -106,10 +106,21 @@ describe('it can be get type of', () => {
   test('a function', () => {
     expect(typeOf(() => {})).toEqual('function');
   });
+});
 
-  test('a constructor', () => {
+describe('it can be check a constructor', () => {
+  test('with a class', () => {
     class A {}
-    expect(typeOf(A)).toEqual('constructor');
+    expect(isConstructor(A)).toBeTruthy();
+  });
+  test('with a function', () => {
+    expect(isConstructor(function () {})).toBeTruthy();
+  });
+  test('with an arrow function', () => {
+    expect(isConstructor(() => {})).toBeFalsy();
+  });
+  test('with an object', () => {
+    expect(isConstructor({})).toBeFalsy();
   });
 });
 

@@ -53,7 +53,7 @@ console.log(_obj.combine(keys, values));
 */
 ```
 
-In case the price length is greater than the key length.
+In case the value length is greater than the key length.
 
 ```js
 const keys = ['id', 'name'];
@@ -626,7 +626,7 @@ console.log(_str('nam').upper().get()); // 'NAM'
 Remove Vietnamese unicode characters from the string.
 
 ```js
-console.log(_str('Trịnh Trần Phương Nam').upper().get()); // 'Trinh Tran Phuong Nam'
+console.log(_str('Trịnh Trần Phương Nam').nonUnicode().get()); // 'Trinh Tran Phuong Nam'
 ```
 
 ### \_str().snake()
@@ -764,47 +764,7 @@ Pads a given value behind a given string until the given length is reached.
 
 ```js
 console.log(_str('200').padEnd(10, '-').get()); // '200-------'
-console.log(_str('200').padEnd(5)); // '200     '
-```
-
-### \_str().caseString()
-
-Casts a value to a string type.
-
-```js
-console.log(_str().caseString({ id: 1, name: 'Nam' })); // '[object Object]'
-console.log(_str().caseString([1, 2, 3])); // '1,2,3'
-console.log(_str().caseString({ toString: () => 'Stringable' })); // 'Stringable'
-console.log(_str().caseString(NaN)); // 'NaN'
-console.log(_str().caseString(() => {})); // '() => {}'
-console.log(
-  _str().caseString(function () {
-    return 'this is a function';
-  }),
-); // function () { return 'this is a function'; }
-```
-
-### \_str().dump()
-
-Same as `_arr().dump()` You can log the results of each processing segment for easy debugging.
-
-```js
-_str('namttp@example.com')
-  .before('@')
-  .dump()
-  .slice(-3)
-  .dump()
-  .padStart(_str(email).before('@').length(), '*')
-  .dump()
-  .append(_str(email).after('@').prepend('@').get())
-  .dump();
-
-/*
-namttp
-ttp
-***ttp
-***ttp@example.com
-*/
+console.log(_str('200').padEnd(5).get()); // '200     '
 ```
 
 ## Collection
@@ -1553,6 +1513,19 @@ console.log(
 ); // true
 ```
 
+### getArray()
+
+const { Collection, getArray } = require('@noravel/supporter');
+
+```js
+console.log(getArray('Nam')); // ['Nam']
+console.log(getArray(1)); // [1]
+console.log(getArray(new Collection([1, 2 ,3]))); // [1, 2, 3]
+console.log(getArray([1, 2 ,3])); // [1, 2, 3]
+console.log(getArray({ toArray: () => [1, 2, 3] })); // [1, 2, 3]
+console.log(getArray('[1,2,3]')); // [1, 2, 3]
+```
+
 ### typeOf()
 
 If you want to check the exact data type then typeOf will help you.
@@ -1574,12 +1547,6 @@ console.log(typeOf([])); // array
 console.log(typeof null); // object
 console.log(typeOf(null)); // null
 
-class A {}
-console.log(typeof A); // function
-console.log(typeOf(A)); // constructor
-```
-
-```js
 function* inf() {
   let i = 1;
   while (true) {
@@ -1589,6 +1556,28 @@ function* inf() {
 }
 console.log(typeof inf); // function
 console.log(typeOf(inf)); // generatorfunction
+```
+
+### isConstructor
+
+```js
+const { isConstructor } = require('@noravel/supporter');
+
+class Alien {
+  sayHello() {
+    return 'Hello';
+  }
+}
+const Human = {
+  sayHi() {
+    return 'Hi';
+  },
+};
+
+console.log(isConstructor(Alien)); // true
+console.log(isConstructor(function () {})); // true
+console.log(isConstructor(() => {})); // false
+console.log(isConstructor(Human)); // false
 ```
 
 ### isJSON()
