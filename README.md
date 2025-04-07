@@ -1563,6 +1563,12 @@ console.log(typeOf(inf)); // generatorfunction
 ```js
 const { isConstructor } = require('@noravel/supporter');
 
+// OR
+
+import { isConstructor } from '@noravel/supporter';
+```
+
+```js
 class Alien {
   sayHello() {
     return 'Hello';
@@ -1585,6 +1591,14 @@ console.log(isConstructor(Human)); // false
 Check if a string value is json.
 
 ```js
+const { isJSON } = require('@noravel/supporter');
+
+// OR
+
+import { isJSON } from '@noravel/supporter';
+```
+
+```js
 console.log(isJSON('{}')); // true
 console.log(isJSON('[]')); // true
 console.log(isJSON('nam')); // false
@@ -1593,6 +1607,14 @@ console.log(isJSON('nam')); // false
 ### queryStringToObject()
 
 Convert a query string to an object.
+
+```js
+const { queryStringToObject } = require('@noravel/supporter');
+
+// OR
+
+import { queryStringToObject } from '@noravel/supporter';
+```
 
 ```js
 console.log(queryStringToObject('?search[name]=Nam&sort_field=id&sort_direction=desc'));
