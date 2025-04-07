@@ -99,15 +99,29 @@ export default class Helper {
    * Helper.typeOf([]); // 'array'
    * Helper.typeOf({}); // 'object'
    * Helper.typeOf(() => {}); // 'function'
-   * Helper.typeOf(class {}); // 'constructor'
    */
   static typeOf(value: any): string {
     const result = Object.prototype.toString.call(value).slice(8, -1).toLowerCase();
 
-    if (result === 'function' && /^class/i.test(value.toString())) {
-      return 'constructor';
+    return result;
+  }
+
+  /**
+   * Check if a value is a constructor.
+   *
+   * @param {any} value The value to check.
+   * @returns {boolean} True if the value is a constructor, false otherwise.
+   */
+  static isConstructor(value: any): boolean {
+    if (Helper.typeOf(value) !== 'function') {
+      return false;
     }
 
-    return result;
+    try {
+      new new Proxy(value, { construct: () => ({}) })();
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }

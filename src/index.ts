@@ -36,6 +36,11 @@ export const isJSON = Helper.isJSON;
 export const queryStringToObject = Helper.queryStringToObject;
 
 /**
+ * Check if a value is a constructor.
+ */
+export const isConstructor = Helper.isConstructor;
+
+/**
  * String supporter.
  */
 export const _str = (value: string = ''): Str => new Str(value);
