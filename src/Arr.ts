@@ -47,9 +47,19 @@ export default class Arr extends Array {
    * @returns {unknown} The first element of the array.
    */
   public first(): unknown {
-    for (const item of this) {
-      return item;
+    if (this.length === 0) {
+      return null;
     }
+
+    return this[0];
+  }
+
+  public last(): unknown {
+    if (this.length === 0) {
+      return null;
+    }
+
+    return this[this.length - 1];
   }
 
   /**

@@ -3,49 +3,34 @@ import Arr from './Arr';
 import Helper from './Support/Helper';
 import { Arrayable, Jsonable, Stringable } from './types';
 
-export default class Collection<TKey, TValue = unknown> implements Arrayable<TValue>, Iterable<TValue>, Jsonable, Stringable {
-  public items: Map<TKey, TValue> = new Map();
-  public isAssociative = false;
+export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonable, Stringable {
+  private items: T[] = [];
 
-  public constructor(items: TValue[] | Map<TKey, TValue> | [TKey, TValue][] = []) {
-    if (items instanceof Map) {
-      this.items = items;
-      items.forEach((_, index) => {
-        if (index !== Number(index)) {
-          this.isAssociative = true;
-        }
-      });
-    } else {
-      this.items = new Map(items.map((value, index) => [index, value])) as Map<TKey, TValue>;
-      this.isAssociative = true;
-    }
+  public constructor(items: T[] = []) {
+    this.items = [...items];
   }
 
   /**
    * Retrieve all of the items in the collection.
    *
-   * @returns {Map<TKey, TValue>} the underlying array
+   * @returns {T[]} the underlying array
    */
-  public all(): TValue[] | [TKey, TValue][] {
-    if (!this.isAssociative) {
-      return [...this.items.values()];
-    }
-
-    return [...this.items.entries()];
+  public all(): T[] {
+    return this.items;
   }
 
   /**
    * Chunk the underlying array into chunks of the given size.
    *
    * @param {number} [size=1] The size of each chunk
-   * @returns {Collection<number, unknown> | this} The chunked collection or the current collection if empty
+   * @returns {Collection<unknown> | this} The chunked collection or the current collection if empty
    */
-  public chunk(size: number = 1): Collection<number, unknown> | this {
+  public chunk(size: number = 1): Collection<unknown> | this {
     if (!this.count()) {
       return this;
     }
 
-    const items = this.values().reduce((result: any[], item, index) => {
+    const items = this.items.reduce((result: any[], item, index) => {
       const chunkIndex = Math.floor(index / size);
       if (!result[chunkIndex]) {
         result[chunkIndex] = [];
@@ -54,21 +39,21 @@ export default class Collection<TKey, TValue = unknown> implements Arrayable<TVa
       return result;
     }, []);
 
-    return new Collection<number, (typeof items)[0]>(items);
+    return new Collection<(typeof items)[0]>(items);
   }
 
   /**
    * Collapse the collection of arrays into a single, flat collection.
    *
-   * @returns {Collection<number, unknown> | this}
+   * @returns {Collection<unknown> | this}
    * @chainable
    */
-  public collapse(): Collection<number, unknown> | this {
+  public collapse(): Collection<unknown> | this {
     if (!this.count()) {
       return this;
     }
 
-    const items = this.values().reduce((result: unknown[], item: TValue) => {
+    const items = this.items.reduce((result: unknown[], item: T) => {
       if (!Array.isArray(item)) {
         return result;
       }
@@ -76,31 +61,31 @@ export default class Collection<TKey, TValue = unknown> implements Arrayable<TVa
       return [...result, ...item];
     }, []);
 
-    return new Collection<number, (typeof items)[0]>(items);
+    return new Collection<(typeof items)[0]>(items);
   }
 
   /**
    * Get a shallow copy of this collection.
    *
-   * @returns {Collection<TKey, TValue>}
+   * @returns {Collection<T>}
    */
-  public collect(): Collection<TKey, TValue> {
-    return new Collection<TKey, TValue>(this.items);
+  public collect(): Collection<T> {
+    return new Collection<T>([...this.items]);
   }
 
   /**
    * Concatenate the underlying array with the given array or collection and return a new collection.
    *
-   * @param {Collection<TKey, TValue>|any[]} items The array to concatenate with
-   * @returns {Collection<TKey, TValue>}
+   * @param {Collection<T>|unknown[]} items The array to concatenate with
+   * @returns {Collection<T>}
    * @chainable
    */
-  public concat(items: Collection<TKey, TValue> | any[]): Collection<TKey, TValue> {
+  public concat(items: Collection<T> | unknown[]): Collection<T> {
     if (items instanceof Collection) {
       items = items.all();
     }
 
-    return new Collection(new Map([...this.items, ...items]));
+    return new Collection([...this.items, ...(<[]>items)]);
   }
 
   /**
@@ -109,21 +94,12 @@ export default class Collection<TKey, TValue = unknown> implements Arrayable<TVa
    * @param {Function | unknown} callback A function that takes in a value, index and array and returns a boolean.
    * @returns {boolean}
    */
-  public contains(callback: (value: TValue, index: TKey, array: Map<TKey, TValue>) => unknown | unknown): boolean {
+  public contains(callback: (value: T, index: number, array: T[]) => unknown | unknown): boolean {
     if (typeof callback !== 'function') {
-      return this.items.has(callback);
+      return this.items.some((value: T) => value === callback);
     }
 
-    let result = false;
-
-    this.items.forEach((value: TValue, index: TKey) => {
-      if (callback(value, index, this.items)) {
-        result = true;
-        return;
-      }
-    });
-
-    return result;
+    return this.items.some(callback);
   }
 
   /**
@@ -132,24 +108,20 @@ export default class Collection<TKey, TValue = unknown> implements Arrayable<TVa
    * @returns {number}
    */
   public count(): number {
-    return this.items.size;
+    return this.items.length;
   }
 
   /**
    * Cross join the given arrays.
    *
    * @param {...any[]} args The arrays to cross join
-   * @returns {Collection<number, unknown> | this}
+   * @returns {Collection<unknown>}
    * @chainable
    */
-  public crossJoin(...args: any[]): Collection<number, unknown> | this {
-    if (this.isAssociative) {
-      return this;
-    }
-
-    return new Collection<number, unknown>(
+  public crossJoin(...args: any[]): Collection<unknown> {
+    return new Collection(
       Arr.crossJoin(
-        this.values(),
+        this.items,
         ...args.map(arg => (arg instanceof Collection ? arg.all() : Collection.wrap(arg).all())),
       ),
     );
@@ -158,16 +130,16 @@ export default class Collection<TKey, TValue = unknown> implements Arrayable<TVa
   /**
    * Get the items in the collection that are not present in the given items.
    *
-   * @param {Collection<TKey, TValue>|unknown[]} items The items to compare against
-   * @returns {Collection<TKey, TValue>}
+   * @param {Collection<T>|unknown[]} items The items to compare against
+   * @returns {Collection<T>}
    * @chainable
    */
-  public diff(items: Collection<TKey, TValue> | unknown[]): Collection<TKey, TValue> {
+  public diff(items: Collection<T> | unknown[]): Collection<T> {
     if (items instanceof Collection) {
       items = items.all();
     }
 
-    return this.filter(item => !items.includes(item));
+    return new Collection(this.items.filter(item => !items.includes(item)));
   }
 
   /**
@@ -185,12 +157,12 @@ export default class Collection<TKey, TValue = unknown> implements Arrayable<TVa
    * @returns {this}
    * @chainable
    */
-  public each(callback: (value: TValue, index: TKey, array: Map<TKey, TValue>) => boolean | undefined): this {
-    this.items.forEach((value: TValue, index: TKey) => {
-      if (callback(value, index, this.items) === false) {
-        return;
+  public each(callback: (value: T, index: number, array: T[]) => boolean | undefined): this {
+    for (let i = 0; i < this.items.length; i++) {
+      if (callback(this.items[i], i, this.items) === false) {
+        break;
       }
-    });
+    }
 
     return this;
   }
@@ -201,35 +173,22 @@ export default class Collection<TKey, TValue = unknown> implements Arrayable<TVa
    * @param {Function} callback A function that takes in a value, index and array and returns a boolean.
    * @returns {boolean}
    */
-  public every(callback: (value: TValue, index: TKey, array: Map<TKey, TValue>) => unknown): boolean {
-    let result = true;
-
-    this.items.forEach((value: TValue, index: TKey) => {
-      if (!callback(value, index, this.items)) {
-        result = false;
-        return;
-      }
-    });
-
-    return result;
+  public every(callback: (value: T, index: number, array: T[]) => unknown): boolean {
+    return this.items.every(callback);
   }
 
   /**
    * Creates a new collection with all elements that pass the test implemented by the provided function.
    *
    * @param {Function} callback A function that takes in a value, index and array and returns a boolean.
-   * @returns {Collection<TKey, TValue>}
+   * @returns {Collection<T>}
    */
-  public filter(callback: (value: TValue, index: TKey, array: Map<TKey, TValue>) => unknown): Collection<TKey, TValue> {
-    const entries: [TKey, TValue][] = [];
+  public filter(callback: (value: T, index: number, array: T[]) => unknown): Collection<T> {
+    if (callback !== undefined) {
+      return new Collection(this.items.filter(callback));
+    }
 
-    this.items.forEach((value: TValue, index: TKey) => {
-      if (callback(value, index, this.items)) {
-        entries.push([index, value]);
-      }
-    });
-
-    return new Collection<TKey, TValue>(entries);
+    return new Collection(this.items.filter(item => !Helper.empty(item)));
   }
 
   /**
@@ -239,18 +198,18 @@ export default class Collection<TKey, TValue = unknown> implements Arrayable<TVa
    * @param {Function} [callback] A function that takes in a value, index and array and returns a boolean.
    * @returns {unknown} The first element in the collection, or undefined if the collection is empty.
    */
-  public first(callback?: (value: TValue, index: TKey, array: Map<TKey, TValue>) => unknown): unknown {
-    let items = this.values();
+  public first(callback?: (value: T, index: number, array: T[]) => unknown): unknown {
+    let items = this.items;
 
     if (callback !== undefined) {
-      items = this.filter(callback).values();
+      items = this.items.filter(callback);
     }
 
-    for (const item of items) {
-      return item;
+    if (items.length === 0) {
+      return null;
     }
 
-    return null;
+    return items[0];
   }
 
   /**
@@ -260,11 +219,11 @@ export default class Collection<TKey, TValue = unknown> implements Arrayable<TVa
    * @param {number} [perPage=10] The number of items per page.
    * @returns {Collection<T>}
    */
-  public forPage(page: number, perPage: number = 10): Collection<number, TValue> {
+  public forPage(page: number, perPage: number = 10): Collection<T> {
     const start = (page - 1) * perPage;
     const end = start + perPage;
 
-    return new Collection<number, TValue>(this.values().slice(start, end));
+    return new Collection<T>(this.items.slice(start, end));
   }
 
   /**
@@ -307,7 +266,7 @@ export default class Collection<TKey, TValue = unknown> implements Arrayable<TVa
    * @returns {boolean} This collection is empty.
    */
   public isEmpty(): boolean {
-    return this.count() === 0;
+    return this.items.length === 0;
   }
 
   /**
@@ -316,7 +275,7 @@ export default class Collection<TKey, TValue = unknown> implements Arrayable<TVa
    * @returns {boolean} This collection is not empty.
    */
   public isNotEmpty(): boolean {
-    return this.count() > 0;
+    return this.items.length > 0;
   }
 
   /**
@@ -325,27 +284,14 @@ export default class Collection<TKey, TValue = unknown> implements Arrayable<TVa
    * @param {Function} [callback] A function that takes in a value, index and array and returns a boolean.
    * @returns {unknown} The last element of the collection.
    */
-  public last(callback?: (value: TValue, index: TKey, array: Map<TKey, TValue>) => unknown): unknown {
-    let items = this.items.values();
+  public last(callback?: (value: T, index: number, array: T[]) => unknown): unknown {
+    let items = this.items;
 
-    // if (callback !== undefined) {
-    //   items = items.filter(callback);
-    // }
-
-    let currentValue = items.next().value;
-    let preValue = currentValue;
-    
-    while (currentValue) {
-      currentValue = items.next().value;
-
-      if (currentValue === undefined) {
-        return preValue;
-      } else {
-        preValue = currentValue;
-      }
+    if (callback !== undefined) {
+      items = items.filter(callback);
     }
 
-    return null;
+    return items[items.length - 1];
   }
 
   /**
@@ -354,14 +300,8 @@ export default class Collection<TKey, TValue = unknown> implements Arrayable<TVa
    * @param {Function} callback A function that takes in a value, index and array and returns a new value.
    * @returns {Collection<unknown>} A new collection with the results of applying the given callback.
    */
-  public map(callback: (value: TValue, index: TKey, array: Map<TKey, TValue>) => unknown): Collection<unknown> {
-    const entries: unknown[] = [];
-
-    this.items.forEach((value: TValue, index: TKey) => {
-      entries.push(callback(value, index, this.items));
-    });
-
-    return new Collection(entries);
+  public map(callback: (value: T, index: number, array: T[]) => unknown): Collection<unknown> {
+    return new Collection(this.items.map(callback));
   }
 
   /**
@@ -440,10 +380,9 @@ export default class Collection<TKey, TValue = unknown> implements Arrayable<TVa
    * @returns {Collection<unknown>} A new collection with the values plucked from the original array.
    */
   public pluck(key: string): Collection<unknown> {
-    const entries = [...this.items.entries()];
-
     return new Collection(
-      entries.map((item: [TKey, TValue]) => (typeof item[1] === 'object' && item[1] !== null ? Obj.get(item[1], key) : null))
+      this.items
+        .map((item: T) => (typeof item === 'object' && item !== null ? Obj.get(item, key) : null))
         .filter(item => item),
     );
   }
@@ -454,29 +393,15 @@ export default class Collection<TKey, TValue = unknown> implements Arrayable<TVa
    * @param {number} [count=1] The number of items to pop.
    * @returns {(T|T[]|undefined)} The popped item or items.
    */
-  public pop(count: number = 1): TValue | TValue[] | null {
-    let entries = [...this.items.entries()];
+  public pop(count: number = 1): T | T[] | undefined {
+    if (count === 1) return this.items.pop();
 
-    if (count === 1) {
-      const result = entries.pop();
-
-      if (result === undefined) {
-        return null;
-      }
-
-      this.items = new Map(entries);
-
-      return result[1];
-    }
-
-    const result: TValue[] = [];
+    const result: T[] = [];
 
     for (let i = 0; i < count; i++) {
-      const tmp = entries.pop();
-      tmp && result.push(tmp[1]);
+      const tmp = this.items.pop();
+      tmp && result.push(tmp);
     }
-
-    this.items = new Map(entries);
 
     return result;
   }
@@ -484,38 +409,25 @@ export default class Collection<TKey, TValue = unknown> implements Arrayable<TVa
   /**
    * Prepends the given values to the collection.
    *
-   * @param {TValue} value The values to prepend.
-   * @param {TKey | null} [key=null] The key to prepend.
-   * @returns {Collection}
+   * @param {T[]} values The values to prepend.
+   * @returns {this}
    * @chainable
    */
-  public prepend(value: TValue, key: TKey | null = null): Collection {
-    let items = this.all() as any[];
+  public prepend(...values: T[]): Collection<T> {
+    this.items.unshift(...values);
 
-    if (this.isAssociative && key !== null) {
-      items = [[key, value]].concat(items);
-    } else {
-      items = [value].concat(items);
-    }
-
-    return new Collection(items);
+    return this;
   }
 
   /**
    * Appends the given item to the end of the collection.
    *
-   * @param {TValue} item The item to append.
+   * @param {T} item The item to append.
    * @returns {this}
    * @chainable
    */
-  public push(item: TValue): this {
-    let newKey = this.count();
-
-    while (this.items.has(newKey as TKey)) {
-      newKey++;
-    }
-
-    this.items.set(newKey as TKey, item);
+  public push(item: T): this {
+    this.items.push(item);
 
     return this;
   }
@@ -523,10 +435,10 @@ export default class Collection<TKey, TValue = unknown> implements Arrayable<TVa
   /**
    * Returns a random item from the collection.
    *
-   * @returns {TValue}
+   * @returns {T}
    */
-  public random(): TValue {
-    return this.values()[Math.floor(Math.random() * this.count())];
+  public random(): T {
+    return this.items[Math.floor(Math.random() * this.items.length)];
   }
 
   /**
@@ -544,10 +456,10 @@ export default class Collection<TKey, TValue = unknown> implements Arrayable<TVa
   /**
    * Returns a new collection with the items in reverse order.
    *
-   * @returns {Collection<TKey, TValue>}
+   * @returns {Collection<T>}
    */
-  public reverse(): Collection<TKey, TValue> {
-    return new Collection([...this.items.entries()].reverse());
+  public reverse(): Collection<T> {
+    return new Collection(this.items.reverse());
   }
 
   /**
@@ -651,11 +563,11 @@ export default class Collection<TKey, TValue = unknown> implements Arrayable<TVa
    * @returns {number} The sum of the collection.
    */
   public sum(key?: string) {
-    return this.values().reduce<number>((total, item) => {
+    return this.items.reduce<number>((total, item) => {
       if (Array.isArray(item)) {
         return total + item.length;
-      } else if (typeof item === 'object' && typeof item?.[key as keyof TValue] === 'number') {
-        return total + (item[key as keyof TValue] as number);
+      } else if (typeof item === 'object' && typeof item?.[key as keyof T] === 'number') {
+        return total + (item[key as keyof T] as number);
       } else if (typeof item === 'number') {
         return total + item;
       }
@@ -673,7 +585,7 @@ export default class Collection<TKey, TValue = unknown> implements Arrayable<TVa
    * @param {Function} callback
    * @returns {this}
    */
-  public tap(callback: (collection: Collection<TKey, TValue>) => void): this {
+  public tap(callback: (collection: Collection<T>) => void): this {
     callback(this);
 
     return this;
@@ -700,19 +612,7 @@ export default class Collection<TKey, TValue = unknown> implements Arrayable<TVa
    * @returns {string}
    */
   public toJson(): string {
-    if (this.isAssociative) {
-      const result: Record<string | number, unknown> = {};
-
-      this.items.forEach((value, key) => {
-        if (typeof key === 'string' || typeof key === 'number') {
-          result[key] = value;
-        }
-      });
-
-      return JSON.stringify(result);
-    }
-
-    return JSON.stringify([...this.items.values()]);
+    return JSON.stringify(this.items);
   }
 
   /**
@@ -730,12 +630,8 @@ export default class Collection<TKey, TValue = unknown> implements Arrayable<TVa
    * @param {string} [key] The key is used to check for a unique value for an array element that is an object.
    * @returns {Collection<T>}
    */
-  public unique(key?: string): Collection<number, TValue> {
-    return new Collection(Arr.new(this.values()).unique(key));
-  }
-
-  public values(): TValue[] {
-    return [...this.items.values()];
+  public unique(key?: string): Collection<T> {
+    return new Collection(Arr.new(this.items).unique(key));
   }
 
   /**
@@ -748,8 +644,8 @@ export default class Collection<TKey, TValue = unknown> implements Arrayable<TVa
    */
   public when(
     condition: any,
-    callback: (collection: Collection<TKey, TValue>, value: unknown) => unknown,
-    defaultValue?: (collection: Collection<TKey, TValue>, value: unknown) => unknown,
+    callback: (collection: Collection<T>, value: unknown) => unknown,
+    defaultValue?: (collection: Collection<T>, value: unknown) => unknown,
   ) {
     const value = typeof condition === 'function' ? condition(this) : condition;
 
@@ -775,7 +671,7 @@ export default class Collection<TKey, TValue = unknown> implements Arrayable<TVa
     return new Collection(item);
   }
 
-  [Symbol.iterator](): Iterator<TValue> {
+  [Symbol.iterator](): Iterator<T> {
     return this.items.values();
   }
 }

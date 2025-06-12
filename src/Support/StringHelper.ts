@@ -97,7 +97,7 @@ export default class StringHelper {
     return value;
   }
 
-  static bindParams(value: string, ...args: any[]): string {
+  static bind(value: string, ...args: any[]): string {
     let valueBound: string = value;
 
     if (Array.isArray(args?.[0])) {

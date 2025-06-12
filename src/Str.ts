@@ -89,11 +89,11 @@ export default class Str implements Stringable {
 
   /**
    * Binds the values ​​to the given string.
-   * @param {any[]} args
+   * @param {any[]} bindings
    * @returns {this}
    */
-  public bind(...args: any[]): this {
-    this.value = StringHelper.bindParams(this.toString(), ...args);
+  public bind(...bindings: any[]): this {
+    this.value = StringHelper.bind(this.toString(), ...bindings);
 
     return this;
   }
@@ -219,12 +219,12 @@ export default class Str implements Stringable {
 
   /**
    * Replace the given value in the given string.
-   * @param {string | RegExp} regexp
-   * @param {string} replacer
+   * @param {string | RegExp} searchValue
+   * @param {string} replaceValue
    * @returns {this}
    */
-  public replace(regexp: string | RegExp, replacer: string): this {
-    this.value = this.value.replace(regexp, replacer);
+  public replace(searchValue: string | RegExp, replaceValue: string): this {
+    this.value = this.value.replace(searchValue, replaceValue);
 
     return this;
   }
