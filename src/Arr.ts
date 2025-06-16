@@ -236,7 +236,9 @@ export default class Arr extends Array {
   }
 
   static new(items: any) {
-    if (!Array.isArray(items)) {
+    if (typeof items[Symbol.iterator] === 'function') {
+      items = Array.from(items);
+    } else if (!Array.isArray(items)) {
       items = [items];
     }
 

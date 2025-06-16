@@ -35,7 +35,7 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
    * @returns {Map<TKey, TValue>} the underlying array
    */
   public all(): T[] | [string, T][] {
-    return this.isSequentialMap() ? this.values() : this.entries();
+    return this.isSequentialMap() ? Array.from(this.items.values()) : Array.from(this.items.entries());
   }
 
   /**
@@ -49,14 +49,16 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
       return this;
     }
 
-    const items = this.values().reduce((result: any[], item, index) => {
-      const chunkIndex = Math.floor(index / size);
-      if (!result[chunkIndex]) {
-        result[chunkIndex] = [];
-      }
-      result[chunkIndex].push(item);
-      return result;
-    }, []);
+    const items = this.values()
+      .toArray()
+      .reduce((result: any[], item, index) => {
+        const chunkIndex = Math.floor(index / size);
+        if (!result[chunkIndex]) {
+          result[chunkIndex] = [];
+        }
+        result[chunkIndex].push(item);
+        return result;
+      }, []);
 
     return new Collection(items);
   }
@@ -72,13 +74,15 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
       return this;
     }
 
-    const items = this.values().reduce((result: unknown[], item: T) => {
-      if (!Array.isArray(item)) {
-        return result;
-      }
+    const items = this.values()
+      .toArray()
+      .reduce((result: unknown[], item: T) => {
+        if (!Array.isArray(item)) {
+          return result;
+        }
 
-      return [...result, ...item];
-    }, []);
+        return [...result, ...item];
+      }, []);
 
     return new Collection(items);
   }
@@ -104,6 +108,10 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
       items = new Collection(items);
     }
 
+    if (this.isSequentialMap()) {
+      return new Collection(this.all().concat(items.all())) as Collection<T>;
+    }
+
     return new Collection(new Map([...this.items, ...items.entries()]));
   }
 
@@ -114,14 +122,13 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
    * @returns {boolean}
    */
   public contains(callback: (value: T, index: string, array: Map<string, T>) => unknown | unknown): boolean {
-    if (typeof callback !== 'function') {
-      return this.items.has(callback);
-    }
-
     let result = false;
 
     this.items.forEach((value: T, index: string) => {
-      if (callback(value, index, this.items)) {
+      if (typeof callback === 'function' && callback(value, index, this.items)) {
+        result = true;
+        return;
+      } else if (value == callback) {
         result = true;
         return;
       }
@@ -153,7 +160,7 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
 
     return new Collection(
       Arr.crossJoin(
-        this.values(),
+        this.values().toArray(),
         ...args.map(arg => (arg instanceof Collection ? arg.all() : Collection.wrap(arg).all())),
       ),
     );
@@ -233,8 +240,12 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
    * @param {Function} callback A function that takes in a value, index and array and returns a boolean.
    * @returns {Collection<T>}
    */
-  public filter(callback: (value: T, index: string, array: Map<string, T>) => unknown): Collection<T> {
+  public filter(callback?: (value: T, index: string, items: Map<string, T>) => unknown): Collection<T> {
     const entries: [string, T][] = [];
+
+    if (callback === undefined) {
+      callback = (value: T) => !Helper.empty(value);
+    }
 
     this.items.forEach((value: T, index: string) => {
       if (callback(value, index, this.items)) {
@@ -252,18 +263,16 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
    * @param {Function} [callback] A function that takes in a value, index and array and returns a boolean.
    * @returns {unknown} The first element in the collection, or undefined if the collection is empty.
    */
-  public first(callback?: (value: T, index: string, array: Map<string, T>) => unknown): T | null {
-    let items = this.values();
+  public first(callback?: (value: T, index: string, array: Map<string, T>) => unknown): T | undefined {
+    let items = this.values().toArray();
 
-    if (callback !== undefined) {
-      items = this.filter(callback).values();
+    if (callback) {
+      items = this.filter(callback).values().toArray();
     }
 
     for (const item of items) {
       return item;
     }
-
-    return null;
   }
 
   /**
@@ -277,7 +286,7 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
     const start = (page - 1) * perPage;
     const end = start + perPage;
 
-    return new Collection(this.values().slice(start, end));
+    return new Collection(this.values().toArray().slice(start, end));
   }
 
   public get(key: string, defaultValue?: any): any {
@@ -291,17 +300,19 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
    * @returns {Record<string, T[]>} A record where the keys are the group names and the values are an array of grouped items.
    */
   public groupBy(key: string): Record<string, T[]> {
-    return this.values().reduce<Record<string, T[]>>((pre, cur: T) => {
-      const groupName = typeof cur === 'object' && cur !== null ? (cur[key as keyof T] as string) : (cur as string);
+    return this.values()
+      .toArray()
+      .reduce<Record<string, T[]>>((pre, cur: T) => {
+        const groupName = typeof cur === 'object' && cur !== null ? (cur[key as keyof T] as string) : (cur as string);
 
-      if (pre[groupName] === undefined) {
-        pre[groupName] = [];
-      }
+        if (pre[groupName] === undefined) {
+          pre[groupName] = [];
+        }
 
-      pre[groupName].push(cur);
+        pre[groupName].push(cur);
 
-      return pre;
-    }, {});
+        return pre;
+      }, {});
   }
 
   /**
@@ -317,7 +328,11 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
 
     const result = new Collection<T>();
 
-    // TODO: implement intersect
+    this.items.forEach((value: any) => {
+      if (items.contains(value)) {
+        result.push(value);
+      }
+    });
 
     return result;
   }
@@ -350,7 +365,7 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
    * @param {Function} [callback] A function that takes in a value, index and array and returns a boolean.
    * @returns {unknown} The last element of the collection.
    */
-  public last(callback?: (value: T, index: string, array: Map<string, T>) => unknown): T | null {
+  public last(callback?: (value: T, index: string, array: Map<string, T>) => unknown): T | undefined {
     let items = this.items.values();
 
     if (callback !== undefined) {
@@ -364,13 +379,13 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
       currentValue = items.next().value;
 
       if (currentValue === undefined) {
-        return preValue ?? null;
+        return preValue;
       } else {
         preValue = currentValue;
       }
     }
 
-    return null;
+    return;
   }
 
   /**
@@ -396,25 +411,27 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
    * @returns {Object} a new object with the key being the group name and the value being an array of grouped values.
    */
   public mapToGroups(callback: (value: any, key: number) => [key: string, value: any]): Collection<any> {
-    const obj = this.values().reduce<Record<string, any>>((pre, cur, index) => {
-      const pair = callback(cur, index);
+    const obj = this.values()
+      .toArray()
+      .reduce<Record<string, Record<string, any>>>((pre, cur, index) => {
+        const pair = callback(cur, index);
 
-      if (!Array.isArray(pair) || pair.length < 2) {
-        throw new RangeError('The callback should return an array with a single key/value pair.');
-      }
+        if (!Array.isArray(pair) || pair.length < 2) {
+          throw new RangeError('The callback should return an array with a single key/value pair.');
+        }
 
-      const [key, value] = pair;
+        const [key, value] = pair;
 
-      if (pre[key] === undefined) {
-        pre[key] = [];
-      }
+        if (pre[key] === undefined) {
+          pre[key] = [];
+        }
 
-      pre[key].push(value);
+        pre[key].push(value);
 
-      return pre;
-    }, {}) as Record<string, any>;
+        return pre;
+      }, {});
 
-    return new Collection(new Map(obj.entries()));
+    return new Collection(new Map(Object.entries(obj)));
   }
 
   /**
@@ -431,7 +448,7 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
       }
 
       this.items = new Map(
-        Arr.new([...this.values(), ...items])
+        Arr.new([...this.items.values(), ...items])
           .unique()
           .map((value, key) => [`${key}`, value]),
       );
@@ -468,9 +485,9 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
     if (length < 0) {
       result = Arr.fillItems(0, Math.abs(this.count() + length) - 1)
         .map(_ => char)
-        .concat(<[]>this.values());
+        .concat(<[]>this.values().toArray());
     } else {
-      result = [...this.values()];
+      result = [...this.items.values()];
 
       while (result.length < length) {
         result.push(char as T);
@@ -502,19 +519,19 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
    * @param {number} [count=1] The number of items to pop.
    * @returns {(T|T[]|undefined)} The popped item or items.
    */
-  public pop(count: number = 1): T | T[] | null {
+  public pop(count: number = 1): T | T[] | undefined {
     let entries = [...this.items.entries()];
 
     if (count === 1) {
       const result = entries.pop();
 
-      if (result === undefined) {
-        return null;
+      if (result) {
+        this.items = new Map(entries);
+
+        return result[1];
       }
 
-      this.items = new Map(entries);
-
-      return result[1];
+      return result;
     }
 
     const result: T[] = [];
@@ -542,7 +559,7 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
       return new Collection(new Map([[key, value], ...this.items.entries()]));
     }
 
-    return new Collection([value].concat(this.values()));
+    return new Collection([value].concat(this.values().toArray()));
   }
 
   /**
@@ -584,7 +601,7 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
    * @returns {T}
    */
   public random(): T {
-    return this.values()[Math.floor(Math.random() * this.count())];
+    return this.values().toArray()[Math.floor(Math.random() * this.count())];
   }
 
   /**
@@ -606,7 +623,7 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
    */
   public reverse(): Collection<T> {
     if (this.isSequentialMap()) {
-      return new Collection([...this.values()].reverse());
+      return new Collection([...this.items.values()].reverse());
     }
 
     return new Collection(new Map([...this.items.entries()].reverse()));
@@ -622,8 +639,14 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
       return;
     }
 
+    const isSequential = this.isSequentialMap();
+
     const [key, value] = this.items.entries().next().value as [string, T];
     this.items.delete(key);
+
+    if (isSequential) {
+      this.items = new Map([...this.items.entries()].map(([key, value]) => [`${Number(key) - 1}`, value]));
+    }
 
     return value;
   }
@@ -655,7 +678,7 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
    */
   public slice(start?: number, end?: number): Collection<T> {
     if (this.isSequentialMap()) {
-      return new Collection([...this.values()].slice(start, end));
+      return new Collection([...this.items.values()].slice(start, end));
     }
 
     return new Collection(new Map([...this.items.entries()].slice(start, end)));
@@ -669,7 +692,7 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
    */
   public sort(callback?: (a: T | [string, T], b: T | [string, T]) => -1 | 0 | 1) {
     if (this.isSequentialMap()) {
-      return new Collection([...this.values()].sort(callback));
+      return new Collection([...this.items.values()].sort(callback));
     }
 
     return new Collection(new Map([...this.items.entries()].sort(callback)));
@@ -693,7 +716,7 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
       offset = entries.length + offset;
     }
 
-    const offsetEnd = offset + (deleteCount ?? 0);
+    const offsetEnd = offset + (deleteCount ?? 1);
     const deleted = entries.slice(offset, offsetEnd);
 
     for (let i = offset; i < offsetEnd && i < entries.length; i++) {
@@ -703,17 +726,13 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
 
     if (replacement.length > 0) {
       if (isSequential) {
-        // Nếu là Map tuần tự: chèn lại theo index
+        // If the Map is not sequential: insert again by index
         const before = entries.slice(0, offset);
         const after = entries.slice(offsetEnd);
-        const newItems = [
-          ...before.map(([, v]) => v),
-          ...replacement,
-          ...after.map(([, v]) => v),
-        ];
+        const newItems = [...before.map(([, v]) => v), ...replacement, ...after.map(([, v]) => v)];
         this.items = new Map(newItems.map((item, index) => [`${index}`, item]));
       } else {
-        // Nếu không phải tuần tự: gán replacement với key mới (theo index)
+        // If the Map is not sequential: assign replacement with new key (by index)
         const result = new Map();
         let i = 0;
         for (let [k, v] of entries.slice(0, offset)) {
@@ -728,7 +747,7 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
         this.items = result;
       }
     } else if (isSequential) {
-      // Sau khi xóa, cần đánh lại index nếu là Map tuần tự
+      // After deleting, need to re-index if the Map is sequential
       const updated = Array.from(this.items.values());
       this.items = new Map(updated.map((item, index) => [`${index}`, item]));
     }
@@ -742,27 +761,27 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
    * @param {number} numberOfGroups The number of groups to split the items into.
    * @returns {Collection<T[]>} A new collection with the items split into a specified number of groups.
    */
-  // public split(numberOfGroups: number) {
-  //   const groupSize = Math.floor(this.count() / numberOfGroups);
-  //   const items = this.items;
-  //   const result = [];
-  //   const remain = this.count() % numberOfGroups;
-  //   let start = 0;
+  public split(numberOfGroups: number) {
+    const groupSize = Math.floor(this.count() / numberOfGroups);
+    const items = this.items;
+    const result = [];
+    const remain = this.count() % numberOfGroups;
+    let start = 0;
 
-  //   for (let i = 0; i < numberOfGroups; i++) {
-  //     let size = groupSize;
+    for (let i = 0; i < numberOfGroups; i++) {
+      let size = groupSize;
 
-  //     if (i < remain) {
-  //       size++;
-  //     }
+      if (i < remain) {
+        size++;
+      }
 
-  //     const end = i === numberOfGroups - 1 ? this.count() : start + size;
-  //     result.push(items.slice(start, end));
-  //     start += size;
-  //   }
+      const end = i === numberOfGroups - 1 ? this.count() : start + size;
+      result.push([...items.values()].slice(start, end));
+      start += size;
+    }
 
-  //   return new Collection(result);
-  // }
+    return new Collection(result);
+  }
 
   /**
    * Calculates the sum of a collection of items.
@@ -776,17 +795,19 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
    * @returns {number} The sum of the collection.
    */
   public sum(key?: string) {
-    return this.values().reduce<number>((total, item) => {
-      if (Array.isArray(item)) {
-        return total + item.length;
-      } else if (typeof item === 'object' && typeof item?.[key as keyof T] === 'number') {
-        return total + (item[key as keyof T] as number);
-      } else if (typeof item === 'number') {
-        return total + item;
-      }
+    return this.values()
+      .toArray()
+      .reduce<number>((total, item) => {
+        if (Array.isArray(item)) {
+          return total + item.length;
+        } else if (typeof item === 'object' && typeof item?.[key as keyof T] === 'number') {
+          return total + (item[key as keyof T] as number);
+        } else if (typeof item === 'number') {
+          return total + item;
+        }
 
-      return total + 1;
-    }, 0);
+        return total + 1;
+      }, 0);
   }
 
   /**
@@ -810,13 +831,17 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
    * @returns {any[]}
    */
   public toArray(): any[] {
-    return this.map((item: any) => {
-      if (typeof item === 'object' && item !== null && typeof item?.toArray === 'function') {
-        return item.toArray();
-      }
+    const result: any[] = [];
 
-      return item;
-    }).all();
+    this.items.forEach((item: any) => {
+      if (typeof item === 'object' && item !== null && typeof item?.toArray === 'function') {
+        result.push(item.toArray());
+      } else {
+        result.push(item);
+      }
+    });
+
+    return result;
   }
 
   /**
@@ -825,19 +850,19 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
    * @returns {string}
    */
   public toJson(): string {
-    if (this.isAssociative) {
-      const result: Record<string | number, unknown> = {};
-
-      this.items.forEach((value, key) => {
-        if (typeof key === 'string' || typeof key === 'number') {
-          result[key] = value;
-        }
-      });
-
-      return JSON.stringify(result);
+    if (this.isSequentialMap()) {
+      return JSON.stringify([...this.items.values()]);
     }
 
-    return JSON.stringify([...this.items.values()]);
+    const result: Record<string | number, unknown> = {};
+
+    this.items.forEach((value, key) => {
+      if (typeof key === 'string' || typeof key === 'number') {
+        result[key] = value;
+      }
+    });
+
+    return JSON.stringify(result);
   }
 
   /**
@@ -856,15 +881,20 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
    * @returns {Collection<T>}
    */
   public unique(key?: string): Collection<T> {
-    if (this.isAssociative) {
-      return this.collect();
+    if (this.isSequentialMap()) {
+      return new Collection(Arr.new(this.items.values()).unique(key));
     }
 
-    return new Collection(Arr.new(this.values()).unique(key));
+    return this.collect();
   }
 
-  public values(): T[] {
-    return Array.from(this.items.values());
+  /**
+   * Get all values of the items in the collection.
+   *
+   * @returns {Collection<T>}
+   */
+  public values(): Collection<T> {
+    return new Collection(Array.from(this.items.values()));
   }
 
   /**

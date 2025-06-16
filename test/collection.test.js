@@ -34,11 +34,26 @@ test('it can replicate a collection', () => {
   expect(actual.all()).toEqual([1, 2, 3, 4, 5]);
 });
 
-test('it can concatenate two collections', () => {
-  const collection1 = _col().range(1, 3);
-  const collection2 = _col().range(4, 6);
-  const actual = collection1.concat(collection2);
-  expect(actual.all()).toEqual([1, 2, 3, 4, 5, 6]);
+describe('it can concatenate', () => {
+  test('with a collection', () => {
+    const collection1 = _col().range(1, 3);
+    const collection2 = _col().range(4, 6);
+    const actual = collection1.concat(collection2);
+    expect(actual.all()).toEqual([1, 2, 3, 4, 5, 6]);
+  });
+
+  test('with an array', () => {
+    const collection = _col().range(1, 3);
+    const actual = collection.concat([4, 5, 6]);
+    expect(actual.all()).toEqual([1, 2, 3, 4, 5, 6]);
+  });
+
+  test('with two unsequence collections', () => {
+    const collection1 = _col({ id: 1 });
+    const collection2 = _col({ name: 'John Doe' });
+    const actual = collection1.concat(collection2);
+    expect(actual.all()).toEqual([['id', 1], ['name', 'John Doe']]);
+  });
 });
 
 describe('it can check whether a collection contains an item', () => {
@@ -127,7 +142,7 @@ describe('it can filter a collection', () => {
       { isEmpty: () => true },
       { count: () => 0 },
     ]);
-    const actual = collection.filter();
+    const actual = collection.filter().values();
     expect(actual.all()).toEqual([1, 2, 3]);
   });
 
@@ -244,10 +259,10 @@ describe('it can run a grouping map over the items', () => {
       { name: 'Jame Doe', department: 'Sales' },
     ]);
     const actual = collection.mapToGroups(user => [user.department, user.name]);
-    expect(actual).toEqual({
-      IT: ['John Doe', 'Jane Doe'],
-      Sales: ['Jame Doe'],
-    });
+    expect(actual.all()).toEqual([
+      ['IT', ['John Doe', 'Jane Doe']],
+      ['Sales', ['Jame Doe']],
+    ]);
   });
 
   test('with an invalid result', () => {
@@ -357,8 +372,8 @@ describe('it can pop an item from the collection', () => {
 
 test('it can prepend items to the collection', () => {
   const collection = _col().range(1, 5);
-  const actual = collection.prepend(-1, 0);
-  expect(actual.all()).toEqual([-1, 0, 1, 2, 3, 4, 5]);
+  const actual = collection.prepend(-1);
+  expect(actual.all()).toEqual([-1, 1, 2, 3, 4, 5]);
 });
 
 test('it can push an item to the collection', () => {
@@ -459,13 +474,15 @@ describe('it can sort the collection', () => {
 describe('it can splice items from the collection', () => {
   test('with one argument', () => {
     const collection = _col().range(1, 5);
-    collection.splice(1);
-    expect(collection.all()).toEqual([1]);
+    const chunk = collection.splice(1);
+    expect(chunk).toEqual([2]);
+    expect(collection.all()).toEqual([1, 3, 4, 5]);
   });
 
   test('with two arguments', () => {
     const collection = _col().range(1, 5);
-    collection.splice(1, 2);
+    const chunk = collection.splice(1, 2);
+    expect(chunk).toEqual([2, 3]);
     expect(collection.all()).toEqual([1, 4, 5]);
   });
 
@@ -615,8 +632,8 @@ describe('it can execute a callback when a condition is truthy', () => {
     const collection = _col().range(1, 5);
     const actual = collection.when(
       undefined,
-      (col, user) => col.filter(value => value === user.id),
-      col => col.filter(value => value > 3),
+      (col, user) => col.filter(value => value === user.id).values(),
+      col => col.filter(value => value > 3).values(),
     );
     expect(actual.all()).toEqual([4, 5]);
   });
@@ -628,10 +645,24 @@ describe('it can execute a callback when a condition is truthy', () => {
   });
 });
 
-test('it can create a new collection with the param is not an array', () => {
-  const collection = _col(1);
-  const actual = collection.all();
-  expect(actual).toEqual([1]);
+describe('it can create a new collection with the param is not an array', () => {
+  test('with a number', () => {
+    const collection = _col(1);
+    const actual = collection.all();
+    expect(actual).toEqual([1]);
+  });
+
+  test('with a string', () => {
+    const collection = _col('1');
+    const actual = collection.all();
+    expect(actual).toEqual(['1']);
+  });
+
+  test('with an object', () => {
+    const collection = _col({ id: 1, name: 'John Doe' });
+    const actual = collection.all();
+    expect(actual).toEqual([['id', 1], ['name', 'John Doe']]);
+  });
 });
 
 test('it is an iterator', () => {
