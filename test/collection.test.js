@@ -52,7 +52,10 @@ describe('it can concatenate', () => {
     const collection1 = _col({ id: 1 });
     const collection2 = _col({ name: 'John Doe' });
     const actual = collection1.concat(collection2);
-    expect(actual.all()).toEqual([['id', 1], ['name', 'John Doe']]);
+    expect(actual.all()).toEqual([
+      ['id', 1],
+      ['name', 'John Doe'],
+    ]);
   });
 });
 
@@ -661,7 +664,10 @@ describe('it can create a new collection with the param is not an array', () => 
   test('with an object', () => {
     const collection = _col({ id: 1, name: 'John Doe' });
     const actual = collection.all();
-    expect(actual).toEqual([['id', 1], ['name', 'John Doe']]);
+    expect(actual).toEqual([
+      ['id', 1],
+      ['name', 'John Doe'],
+    ]);
   });
 });
 
