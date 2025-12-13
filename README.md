@@ -767,6 +767,30 @@ console.log(_str('200').padEnd(10, '-').get()); // '200-------'
 console.log(_str('200').padEnd(5).get()); // '200     '
 ```
 
+### \_str().ltrim()
+
+Remove whitespace from the left side of a string.
+
+```js
+console.log(_str('  Hello world  ').ltrim().get()); // 'Hello world  '
+```
+
+### \_str().rtrim()
+
+Remove whitespace from the right side of a string.
+
+```js
+console.log(_str('  Hello world  ').rtrim().get()); // '  Hello world'
+```
+
+### \_str().trim()
+
+Remove whitespace from both sides of a string.
+
+```js
+console.log(_str('  Hello world  ').trim().get()); // 'Hello world'
+```
+
 ## Collection
 
 Create a collection instance from an array or object.
