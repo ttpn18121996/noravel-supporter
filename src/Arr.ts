@@ -54,6 +54,11 @@ export default class Arr extends Array {
     return this[0];
   }
 
+  /**
+   * Returns the last element of the array.
+   *
+   * @returns {unknown} The last element of the array.
+   */
   public last(): unknown {
     if (this.length === 0) {
       return null;

@@ -289,6 +289,13 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
     return new Collection(this.values().toArray().slice(start, end));
   }
 
+  /**
+   * Get the value at the given key.
+   *
+   * @param {string} key The key to get the value for.
+   * @param {any} [defaultValue] The default value to return if the key is not found.
+   * @returns {any} The value at the given key, or the default value if the key is not found.
+   */
   public get(key: string, defaultValue?: any): any {
     return this.items.get(key) ?? defaultValue;
   }
@@ -355,6 +362,11 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
     return this.count() > 0;
   }
 
+  /**
+   * Get the keys of the collection.
+   *
+   * @returns {string[]} An array of the collection's keys.
+   */
   public keys(): string[] {
     return Array.from(this.items.keys());
   }
@@ -857,7 +869,7 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
     const result: Record<string | number, unknown> = {};
 
     this.items.forEach((value, key) => {
-      if (typeof key === 'string' || typeof key === 'number') {
+      if (typeof key === 'string') {
         result[key] = value;
       }
     });
