@@ -161,6 +161,17 @@ export default class Str implements Stringable {
   }
 
   /**
+   * Strip whitespace (or other characters) from the beginning of a string.
+   * @param {string} characters
+   * @returns {this}
+   */
+  public ltrim(characters: string = ' \t\n\r\v\x00'): this {
+    this.value = this.value.replace(new RegExp(`^[${characters}]+`, 'g'), '');
+
+    return this;
+  }
+
+  /**
    * Remove Vietnamese unicode characters from the string.
    * @returns {this}
    */
@@ -242,6 +253,17 @@ export default class Str implements Stringable {
   }
 
   /**
+   * Strip whitespace (or other characters) from the end of a string.
+   * @param {string} characters
+   * @returns {this}
+   */
+  public rtrim(characters: string = ' \t\n\r\v\x00'): this {
+    this.value = this.value.replace(new RegExp(`[${characters}]+$`, 'g'), '');
+
+    return this;
+  }
+
+  /**
    * Randomly shuffles a string.
    * @returns {this}
    */
@@ -313,6 +335,18 @@ export default class Str implements Stringable {
    */
   public toString(): string {
     return this.value.toString();
+  }
+
+  /**
+   * Strip whitespace (or other characters) from the beginning and end of a string.
+   * @param {string} characters
+   * @returns {this}
+   */
+  public trim(characters: string = ' \t\n\r\v\x00'): this {
+    this.ltrim(characters);
+    this.rtrim(characters);
+
+    return this;
   }
 
   /**
