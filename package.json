@@ -6,6 +6,9 @@
     "type": "git",
     "url": "https://github.com/ttpn18121996/noravel-supporter.git"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
