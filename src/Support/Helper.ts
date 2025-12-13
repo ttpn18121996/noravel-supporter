@@ -39,10 +39,14 @@ export default class Helper {
       typeof (items as { toArray: () => unknown[] })?.toArray === 'function'
     ) {
       return (items as { toArray: () => unknown[] }).toArray();
-    } else if (Helper.typeOf(items) === 'string' && Helper.isJSON(items as string)) {
+    } else if (
+      Helper.typeOf(items) === 'string' &&
+      items.startsWith('[') &&
+      items.endsWith(']') &&
+      Helper.isJSON(items as string)
+    ) {
       return JSON.parse(items as string);
     }
-
     return [items];
   }
 

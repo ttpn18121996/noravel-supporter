@@ -280,6 +280,32 @@ describe('it can be cast to string type', () => {
   });
 });
 
+describe('it can trim the given string', () => {
+  test('with default characters from the end of a string', () => {
+    expect(_str('  Hello World  ').rtrim().get()).toEqual('  Hello World');
+  });
+
+  test('with custom characters from the end of a string', () => {
+    expect(_str('Hello World/').rtrim('/').get()).toEqual('Hello World');
+  });
+
+  test('with default characters from the beginning of a string', () => {
+    expect(_str('  Hello World  ').ltrim().get()).toEqual('Hello World  ');
+  });
+
+  test('with custom characters from the beginning of a string', () => {
+    expect(_str('/Hello World').ltrim('/').get()).toEqual('Hello World');
+  });
+
+  test('with default characters from the beginning and end of a string', () => {
+    expect(_str('  Hello World  ').trim().get()).toEqual('Hello World');
+  });
+
+  test('with custom characters from the beginning and end of a string', () => {
+    expect(_str('/Hello World/').trim('/').get()).toEqual('Hello World');
+  });
+});
+
 test('it can register a custom macro', () => {
   Str.macro('custom', () => {
     return 'custom';

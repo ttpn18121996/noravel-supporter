@@ -89,11 +89,11 @@ export default class Str implements Stringable {
 
   /**
    * Binds the values ​​to the given string.
-   * @param {any[]} args
+   * @param {any[]} bindings
    * @returns {this}
    */
-  public bind(...args: any[]): this {
-    this.value = StringHelper.bindParams(this.toString(), ...args);
+  public bind(...bindings: any[]): this {
+    this.value = StringHelper.bind(this.toString(), ...bindings);
 
     return this;
   }
@@ -161,6 +161,17 @@ export default class Str implements Stringable {
   }
 
   /**
+   * Strip whitespace (or other characters) from the beginning of a string.
+   * @param {string} characters
+   * @returns {this}
+   */
+  public ltrim(characters: string = ' \t\n\r\v\x00'): this {
+    this.value = this.value.replace(new RegExp(`^[${characters}]+`, 'g'), '');
+
+    return this;
+  }
+
+  /**
    * Remove Vietnamese unicode characters from the string.
    * @returns {this}
    */
@@ -219,12 +230,12 @@ export default class Str implements Stringable {
 
   /**
    * Replace the given value in the given string.
-   * @param {string | RegExp} regexp
-   * @param {string} replacer
+   * @param {string | RegExp} searchValue
+   * @param {string} replaceValue
    * @returns {this}
    */
-  public replace(regexp: string | RegExp, replacer: string): this {
-    this.value = this.value.replace(regexp, replacer);
+  public replace(searchValue: string | RegExp, replaceValue: string): this {
+    this.value = this.value.replace(searchValue, replaceValue);
 
     return this;
   }
@@ -237,6 +248,17 @@ export default class Str implements Stringable {
    */
   public replaceAt(index: number, replacement: string): this {
     this.value = StringHelper.replaceAt(this.toString(), index, replacement);
+
+    return this;
+  }
+
+  /**
+   * Strip whitespace (or other characters) from the end of a string.
+   * @param {string} characters
+   * @returns {this}
+   */
+  public rtrim(characters: string = ' \t\n\r\v\x00'): this {
+    this.value = this.value.replace(new RegExp(`[${characters}]+$`, 'g'), '');
 
     return this;
   }
@@ -313,6 +335,18 @@ export default class Str implements Stringable {
    */
   public toString(): string {
     return this.value.toString();
+  }
+
+  /**
+   * Strip whitespace (or other characters) from the beginning and end of a string.
+   * @param {string} characters
+   * @returns {this}
+   */
+  public trim(characters: string = ' \t\n\r\v\x00'): this {
+    this.ltrim(characters);
+    this.rtrim(characters);
+
+    return this;
   }
 
   /**

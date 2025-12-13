@@ -47,9 +47,24 @@ export default class Arr extends Array {
    * @returns {unknown} The first element of the array.
    */
   public first(): unknown {
-    for (const item of this) {
-      return item;
+    if (this.length === 0) {
+      return null;
     }
+
+    return this[0];
+  }
+
+  /**
+   * Returns the last element of the array.
+   *
+   * @returns {unknown} The last element of the array.
+   */
+  public last(): unknown {
+    if (this.length === 0) {
+      return null;
+    }
+
+    return this[this.length - 1];
   }
 
   /**
@@ -226,7 +241,9 @@ export default class Arr extends Array {
   }
 
   static new(items: any) {
-    if (!Array.isArray(items)) {
+    if (typeof items[Symbol.iterator] === 'function') {
+      items = Array.from(items);
+    } else if (!Array.isArray(items)) {
       items = [items];
     }
 

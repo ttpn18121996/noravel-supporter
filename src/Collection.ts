@@ -3,89 +3,116 @@ import Arr from './Arr';
 import Helper from './Support/Helper';
 import { Arrayable, Jsonable, Stringable } from './types';
 
-export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonable, Stringable {
-  private items: T[] = [];
+export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, Jsonable, Stringable {
+  public items: Map<string, T> = new Map();
+  public isAssociative = false;
 
-  public constructor(items: T[] = []) {
-    this.items = [...items];
+  public constructor(items: T[] | Map<string, T> | Record<string, T> = []) {
+    if (items instanceof Map) {
+      this.items = items;
+    } else if (Array.isArray(items)) {
+      this.items = new Map(items.map((value, index) => [`${index}`, value]));
+    } else {
+      this.items = new Map(Object.entries(items)) as Map<string, T>;
+    }
+  }
+
+  private isSequentialMap(): boolean {
+    const keys = this.keys();
+
+    if (!keys.every(key => /^\d+$/.test(key))) {
+      return false;
+    }
+
+    const numericKeys = keys.map(Number).sort((a, b) => a - b);
+
+    return numericKeys.every((key, index) => key === index);
   }
 
   /**
    * Retrieve all of the items in the collection.
    *
-   * @returns {T[]} the underlying array
+   * @returns {Map<TKey, TValue>} the underlying array
    */
-  public all(): T[] {
-    return this.items;
+  public all(): T[] | [string, T][] {
+    return this.isSequentialMap() ? Array.from(this.items.values()) : Array.from(this.items.entries());
   }
 
   /**
    * Chunk the underlying array into chunks of the given size.
    *
    * @param {number} [size=1] The size of each chunk
-   * @returns {Collection<unknown> | this} The chunked collection or the current collection if empty
+   * @returns {Collection | this} The chunked collection or the current collection if empty
    */
-  public chunk(size: number = 1): Collection<unknown> | this {
+  public chunk(size: number = 1): Collection | this {
     if (!this.count()) {
       return this;
     }
 
-    const items = this.items.reduce((result: any[], item, index) => {
-      const chunkIndex = Math.floor(index / size);
-      if (!result[chunkIndex]) {
-        result[chunkIndex] = [];
-      }
-      result[chunkIndex].push(item);
-      return result;
-    }, []);
+    const items = this.values()
+      .toArray()
+      .reduce((result: any[], item, index) => {
+        const chunkIndex = Math.floor(index / size);
+        if (!result[chunkIndex]) {
+          result[chunkIndex] = [];
+        }
+        result[chunkIndex].push(item);
+        return result;
+      }, []);
 
-    return new Collection<(typeof items)[0]>(items);
+    return new Collection(items);
   }
 
   /**
    * Collapse the collection of arrays into a single, flat collection.
    *
-   * @returns {Collection<unknown> | this}
+   * @returns {Collection | this}
    * @chainable
    */
-  public collapse(): Collection<unknown> | this {
+  public collapse(): Collection | this {
     if (!this.count()) {
       return this;
     }
 
-    const items = this.items.reduce((result: unknown[], item: T) => {
-      if (!Array.isArray(item)) {
-        return result;
-      }
+    const items = this.values()
+      .toArray()
+      .reduce((result: unknown[], item: T) => {
+        if (!Array.isArray(item)) {
+          return result;
+        }
 
-      return [...result, ...item];
-    }, []);
+        return [...result, ...item];
+      }, []);
 
-    return new Collection<(typeof items)[0]>(items);
+    return new Collection(items);
   }
 
   /**
    * Get a shallow copy of this collection.
    *
-   * @returns {Collection<T>}
+   * @returns {Collection}
    */
-  public collect(): Collection<T> {
-    return new Collection<T>([...this.items]);
+  public collect(): Collection {
+    return new Collection(this.items);
   }
 
   /**
    * Concatenate the underlying array with the given array or collection and return a new collection.
    *
-   * @param {Collection<T>|unknown[]} items The array to concatenate with
+   * @param {Collection<T> | any[]} items The array to concatenate with
    * @returns {Collection<T>}
    * @chainable
    */
-  public concat(items: Collection<T> | unknown[]): Collection<T> {
-    if (items instanceof Collection) {
-      items = items.all();
+  public concat(items: Collection<T> | any[]): Collection<T> {
+    if (Array.isArray(items)) {
+      items = new Collection(items);
     }
 
-    return new Collection([...this.items, ...(<[]>items)]);
+    if (this.isSequentialMap()) {
+      return new Collection(this.all().concat(items.all())) as Collection<T>;
+    }
+
+    return new Collection(new Map([...this.items, ...items.entries()]));
   }
 
   /**
@@ -94,12 +121,20 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
    * @param {Function | unknown} callback A function that takes in a value, index and array and returns a boolean.
    * @returns {boolean}
    */
-  public contains(callback: (value: T, index: number, array: T[]) => unknown | unknown): boolean {
-    if (typeof callback !== 'function') {
-      return this.items.some((value: T) => value === callback);
-    }
+  public contains(callback: (value: T, index: string, array: Map<string, T>) => unknown | unknown): boolean {
+    let result = false;
 
-    return this.items.some(callback);
+    this.items.forEach((value: T, index: string) => {
+      if (typeof callback === 'function' && callback(value, index, this.items)) {
+        result = true;
+        return;
+      } else if (value == callback) {
+        result = true;
+        return;
+      }
+    });
+
+    return result;
   }
 
   /**
@@ -108,20 +143,24 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
    * @returns {number}
    */
   public count(): number {
-    return this.items.length;
+    return this.items.size;
   }
 
   /**
    * Cross join the given arrays.
    *
    * @param {...any[]} args The arrays to cross join
-   * @returns {Collection<unknown>}
+   * @returns {Collection | this}
    * @chainable
    */
-  public crossJoin(...args: any[]): Collection<unknown> {
+  public crossJoin(...args: any[]): Collection | this {
+    if (!this.isSequentialMap()) {
+      return this;
+    }
+
     return new Collection(
       Arr.crossJoin(
-        this.items,
+        this.values().toArray(),
         ...args.map(arg => (arg instanceof Collection ? arg.all() : Collection.wrap(arg).all())),
       ),
     );
@@ -130,7 +169,7 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
   /**
    * Get the items in the collection that are not present in the given items.
    *
-   * @param {Collection<T>|unknown[]} items The items to compare against
+   * @param {Collection<T> | unknown[]} items The items to compare against
    * @returns {Collection<T>}
    * @chainable
    */
@@ -139,7 +178,7 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
       items = items.all();
     }
 
-    return new Collection(this.items.filter(item => !items.includes(item)));
+    return this.filter(item => !items.includes(item));
   }
 
   /**
@@ -157,14 +196,23 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
    * @returns {this}
    * @chainable
    */
-  public each(callback: (value: T, index: number, array: T[]) => boolean | undefined): this {
-    for (let i = 0; i < this.items.length; i++) {
-      if (callback(this.items[i], i, this.items) === false) {
-        break;
+  public each(callback: (value: T, index: string, array: Map<string, T>) => boolean | undefined): this {
+    this.items.forEach((value: T, index: string) => {
+      if (callback(value, index, this.items) === false) {
+        return;
       }
-    }
+    });
 
     return this;
+  }
+
+  /**
+   * Returns an array of the collection's entries.
+   *
+   * @returns {Array} An array of the collection's entries.
+   */
+  public entries(): [string, T][] {
+    return Array.from(this.items.entries());
   }
 
   /**
@@ -173,8 +221,17 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
    * @param {Function} callback A function that takes in a value, index and array and returns a boolean.
    * @returns {boolean}
    */
-  public every(callback: (value: T, index: number, array: T[]) => unknown): boolean {
-    return this.items.every(callback);
+  public every(callback: (value: T, index: string, array: Map<string, T>) => unknown): boolean {
+    let result = true;
+
+    this.items.forEach((value: T, index: string) => {
+      if (!callback(value, index, this.items)) {
+        result = false;
+        return;
+      }
+    });
+
+    return result;
   }
 
   /**
@@ -183,12 +240,20 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
    * @param {Function} callback A function that takes in a value, index and array and returns a boolean.
    * @returns {Collection<T>}
    */
-  public filter(callback: (value: T, index: number, array: T[]) => unknown): Collection<T> {
-    if (callback !== undefined) {
-      return new Collection(this.items.filter(callback));
+  public filter(callback?: (value: T, index: string, items: Map<string, T>) => unknown): Collection<T> {
+    const entries: [string, T][] = [];
+
+    if (callback === undefined) {
+      callback = (value: T) => !Helper.empty(value);
     }
 
-    return new Collection(this.items.filter(item => !Helper.empty(item)));
+    this.items.forEach((value: T, index: string) => {
+      if (callback(value, index, this.items)) {
+        entries.push([index, value]);
+      }
+    });
+
+    return new Collection(new Map(entries));
   }
 
   /**
@@ -198,18 +263,16 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
    * @param {Function} [callback] A function that takes in a value, index and array and returns a boolean.
    * @returns {unknown} The first element in the collection, or undefined if the collection is empty.
    */
-  public first(callback?: (value: T, index: number, array: T[]) => unknown): unknown {
-    let items = this.items;
+  public first(callback?: (value: T, index: string, array: Map<string, T>) => unknown): T | undefined {
+    let items = this.values().toArray();
 
-    if (callback !== undefined) {
-      items = this.items.filter(callback);
+    if (callback) {
+      items = this.filter(callback).values().toArray();
     }
 
     for (const item of items) {
       return item;
     }
-
-    return undefined;
   }
 
   /**
@@ -223,7 +286,18 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
     const start = (page - 1) * perPage;
     const end = start + perPage;
 
-    return new Collection<T>(this.items.slice(start, end));
+    return new Collection(this.values().toArray().slice(start, end));
+  }
+
+  /**
+   * Get the value at the given key.
+   *
+   * @param {string} key The key to get the value for.
+   * @param {any} [defaultValue] The default value to return if the key is not found.
+   * @returns {any} The value at the given key, or the default value if the key is not found.
+   */
+  public get(key: string, defaultValue?: any): any {
+    return this.items.get(key) ?? defaultValue;
   }
 
   /**
@@ -233,31 +307,41 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
    * @returns {Record<string, T[]>} A record where the keys are the group names and the values are an array of grouped items.
    */
   public groupBy(key: string): Record<string, T[]> {
-    return this.items.reduce<Record<string, T[]>>((pre, cur: T) => {
-      const groupName = typeof cur === 'object' && cur !== null ? (cur[key as keyof T] as string) : (cur as string);
+    return this.values()
+      .toArray()
+      .reduce<Record<string, T[]>>((pre, cur: T) => {
+        const groupName = typeof cur === 'object' && cur !== null ? (cur[key as keyof T] as string) : (cur as string);
 
-      if (pre[groupName] === undefined) {
-        pre[groupName] = [];
-      }
+        if (pre[groupName] === undefined) {
+          pre[groupName] = [];
+        }
 
-      pre[groupName].push(cur);
+        pre[groupName].push(cur);
 
-      return pre;
-    }, {});
+        return pre;
+      }, {});
   }
 
   /**
    * Returns a new collection that contains only the items that are present in both the current collection and the given items.
    *
-   * @param {Collection<T>|unknown[]} items The items to compare against
+   * @param {Collection<T> | any[]} items The items to compare against
    * @returns {Collection<T>}
    */
-  public intersect(items: Collection<T> | unknown[]): Collection<T> {
-    if (items instanceof Collection) {
-      items = items.all();
+  public intersect(items: Collection<T> | any[]): Collection<T> {
+    if (Array.isArray(items)) {
+      items = new Collection(items);
     }
 
-    return new Collection<T>(this.items.filter(item => items.includes(item)));
+    const result = new Collection<T>();
+
+    this.items.forEach((value: any) => {
+      if (items.contains(value)) {
+        result.push(value);
+      }
+    });
+
+    return result;
   }
 
   /**
@@ -266,7 +350,7 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
    * @returns {boolean} This collection is empty.
    */
   public isEmpty(): boolean {
-    return this.items.length === 0;
+    return this.count() === 0;
   }
 
   /**
@@ -275,7 +359,16 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
    * @returns {boolean} This collection is not empty.
    */
   public isNotEmpty(): boolean {
-    return this.items.length > 0;
+    return this.count() > 0;
+  }
+
+  /**
+   * Get the keys of the collection.
+   *
+   * @returns {string[]} An array of the collection's keys.
+   */
+  public keys(): string[] {
+    return Array.from(this.items.keys());
   }
 
   /**
@@ -284,14 +377,27 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
    * @param {Function} [callback] A function that takes in a value, index and array and returns a boolean.
    * @returns {unknown} The last element of the collection.
    */
-  public last(callback?: (value: T, index: number, array: T[]) => unknown): unknown {
-    let items = this.items;
+  public last(callback?: (value: T, index: string, array: Map<string, T>) => unknown): T | undefined {
+    let items = this.items.values();
 
     if (callback !== undefined) {
-      items = items.filter(callback);
+      items = this.filter(callback).items.values();
     }
 
-    return items[items.length - 1];
+    let currentValue = items.next().value;
+    let preValue = currentValue;
+
+    while (currentValue) {
+      currentValue = items.next().value;
+
+      if (currentValue === undefined) {
+        return preValue;
+      } else {
+        preValue = currentValue;
+      }
+    }
+
+    return;
   }
 
   /**
@@ -300,8 +406,14 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
    * @param {Function} callback A function that takes in a value, index and array and returns a new value.
    * @returns {Collection<unknown>} A new collection with the results of applying the given callback.
    */
-  public map(callback: (value: T, index: number, array: T[]) => unknown): Collection<unknown> {
-    return new Collection(this.items.map(callback));
+  public map(callback: (value: T, index: string, array: Map<string, T>) => unknown): Collection<unknown> {
+    const items: unknown[] = [];
+
+    this.items.forEach((value: T, index: string) => {
+      items.push(callback(value, index, this.items));
+    });
+
+    return new Collection(items);
   }
 
   /**
@@ -310,24 +422,28 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
    * @param {Function} callback Return an array with a single key/value pair.
    * @returns {Object} a new object with the key being the group name and the value being an array of grouped values.
    */
-  public mapToGroups(callback: (value: any, key: number) => [key: string, value: any]): { [key: string]: any } {
-    return this.items.reduce<Record<string, Record<string, any>>>((pre, cur, index) => {
-      const pair = callback(cur, index);
+  public mapToGroups(callback: (value: any, key: number) => [key: string, value: any]): Collection<any> {
+    const obj = this.values()
+      .toArray()
+      .reduce<Record<string, Record<string, any>>>((pre, cur, index) => {
+        const pair = callback(cur, index);
 
-      if (!Array.isArray(pair) || pair.length < 2) {
-        throw new RangeError('The callback should return an array with a single key/value pair.');
-      }
+        if (!Array.isArray(pair) || pair.length < 2) {
+          throw new RangeError('The callback should return an array with a single key/value pair.');
+        }
 
-      const [key, value] = pair;
+        const [key, value] = pair;
 
-      if (pre[key] === undefined) {
-        pre[key] = [];
-      }
+        if (pre[key] === undefined) {
+          pre[key] = [];
+        }
 
-      pre[key].push(value);
+        pre[key].push(value);
 
-      return pre;
-    }, {});
+        return pre;
+      }, {});
+
+    return new Collection(new Map(Object.entries(obj)));
   }
 
   /**
@@ -338,11 +454,27 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
    * @chainable
    */
   public merge(items: Collection<T> | unknown[]): this {
-    if (items instanceof Collection) {
-      items = items.all();
-    }
+    if (this.isSequentialMap()) {
+      if (items instanceof Collection) {
+        items = items.values();
+      }
 
-    this.items = Arr.new(this.items.concat(<[]>items)).unique();
+      this.items = new Map(
+        Arr.new([...this.items.values(), ...items])
+          .unique()
+          .map((value, key) => [`${key}`, value]),
+      );
+    } else {
+      if (Array.isArray(items)) {
+        items = new Collection(items) as Collection<T>;
+      }
+
+      items.entries().forEach(([key, value]) => {
+        if (!this.items.has(key)) {
+          this.items.set(key, value);
+        }
+      });
+    }
 
     return this;
   }
@@ -353,36 +485,42 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
    *
    * @param {number} length The length to pad the collection to.
    * @param {string} [char=''] The value to pad with.
-   * @returns {Collection<unknown>} A new collection with the padded items.
+   * @returns {Collection} A new collection with the padded items.
    */
-  public pad(length: number, char: string = ''): Collection<unknown> {
-    let result = [];
+  public pad(length: number, char: string = ''): Collection {
+    if (!this.isSequentialMap()) {
+      return this;
+    }
+
+    let result: string[] | T[] = [];
 
     if (length < 0) {
-      result = Arr.fillItems(0, Math.abs(this.items.length + length) - 1)
+      result = Arr.fillItems(0, Math.abs(this.count() + length) - 1)
         .map(_ => char)
-        .concat(<[]>this.items);
+        .concat(<[]>this.values().toArray());
     } else {
-      result = [...this.items];
+      result = [...this.items.values()];
 
       while (result.length < length) {
         result.push(char as T);
       }
     }
 
-    return new Collection<unknown>(result);
+    return new Collection<any>(result);
   }
 
   /**
    * Pluck an array of values from the collection.
    *
    * @param {string} key The key name needs to be taken from another array.
-   * @returns {Collection<unknown>} A new collection with the values plucked from the original array.
+   * @returns {Collection<any>} A new collection with the values plucked from the original array.
    */
-  public pluck(key: string): Collection<unknown> {
+  public pluck(key: string): Collection<any> {
+    const entries = [...this.items.entries()];
+
     return new Collection(
-      this.items
-        .map((item: T) => (typeof item === 'object' && item !== null ? Obj.get(item, key) : null))
+      entries
+        .map((item: [string, any]) => (typeof item[1] === 'object' && item[1] !== null ? Obj.get(item[1], key) : null))
         .filter(item => item),
     );
   }
@@ -394,14 +532,28 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
    * @returns {(T|T[]|undefined)} The popped item or items.
    */
   public pop(count: number = 1): T | T[] | undefined {
-    if (count === 1) return this.items.pop();
+    let entries = [...this.items.entries()];
+
+    if (count === 1) {
+      const result = entries.pop();
+
+      if (result) {
+        this.items = new Map(entries);
+
+        return result[1];
+      }
+
+      return result;
+    }
 
     const result: T[] = [];
 
     for (let i = 0; i < count; i++) {
-      const tmp = this.items.pop();
-      tmp && result.push(tmp);
+      const tmp = entries.pop();
+      tmp && result.push(tmp[1]);
     }
+
+    this.items = new Map(entries);
 
     return result;
   }
@@ -409,25 +561,48 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
   /**
    * Prepends the given values to the collection.
    *
-   * @param {T[]} values The values to prepend.
-   * @returns {this}
+   * @param {TValue} value The values to prepend.
+   * @param {TKey | null} [key=null] The key to prepend.
+   * @returns {Collection}
    * @chainable
    */
-  public prepend(...values: T[]): Collection<T> {
-    this.items.unshift(...values);
+  public prepend(value: T, key: string | null = null): Collection<T> {
+    if (!this.isSequentialMap() && key !== null) {
+      return new Collection(new Map([[key, value], ...this.items.entries()]));
+    }
 
-    return this;
+    return new Collection([value].concat(this.values().toArray()));
   }
 
   /**
    * Appends the given item to the end of the collection.
    *
-   * @param {T} item The item to append.
+   * @param {TValue} item The item to append.
    * @returns {this}
    * @chainable
    */
   public push(item: T): this {
-    this.items.push(item);
+    let newKey = this.count();
+
+    while (this.items.has(`${newKey}`)) {
+      newKey++;
+    }
+
+    this.items.set(`${newKey}`, item);
+
+    return this;
+  }
+
+  /**
+   * Puts a value into the collection at the specified key.
+   *
+   * @param {string} key The key to put the value at.
+   * @param {TValue} value The value to put into the collection.
+   * @returns {this}
+   * @chainable
+   */
+  public put(key: string, value: T): this {
+    this.items.set(key, value);
 
     return this;
   }
@@ -438,7 +613,7 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
    * @returns {T}
    */
   public random(): T {
-    return this.items[Math.floor(Math.random() * this.items.length)];
+    return this.values().toArray()[Math.floor(Math.random() * this.count())];
   }
 
   /**
@@ -459,7 +634,11 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
    * @returns {Collection<T>}
    */
   public reverse(): Collection<T> {
-    return new Collection(this.items.reverse());
+    if (this.isSequentialMap()) {
+      return new Collection([...this.items.values()].reverse());
+    }
+
+    return new Collection(new Map([...this.items.entries()].reverse()));
   }
 
   /**
@@ -468,7 +647,20 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
    * @returns {T|undefined} The first element of the collection, or undefined if the collection is empty.
    */
   public shift(): T | undefined {
-    return this.items.shift();
+    if (this.count() === 0) {
+      return;
+    }
+
+    const isSequential = this.isSequentialMap();
+
+    const [key, value] = this.items.entries().next().value as [string, T];
+    this.items.delete(key);
+
+    if (isSequential) {
+      this.items = new Map([...this.items.entries()].map(([key, value]) => [`${Number(key) - 1}`, value]));
+    }
+
+    return value;
   }
 
   /**
@@ -478,11 +670,12 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
    * @chainable
    */
   public shuffle() {
-    for (let i = this.items.length - 1; i > 0; i--) {
+    const keys = [...this.items.keys()];
+    for (let i = this.count() - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      const tmp = this.items[i];
-      this.items[i] = this.items[j];
-      this.items[j] = tmp;
+      const tmp = this.items.get(keys[i]) as T;
+      this.items.set(keys[i], this.items.get(keys[j]) as T);
+      this.items.set(keys[j], tmp);
     }
 
     return this;
@@ -496,7 +689,11 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
    * @returns {Collection<T>}
    */
   public slice(start?: number, end?: number): Collection<T> {
-    return new Collection<T>(this.items.slice(start, end));
+    if (this.isSequentialMap()) {
+      return new Collection([...this.items.values()].slice(start, end));
+    }
+
+    return new Collection(new Map([...this.items.entries()].slice(start, end)));
   }
 
   /**
@@ -505,22 +702,69 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
    * @param {((a: T, b: T) => -1 | 0 | 1) | undefined} [callback] The compare function.
    * @returns {Collection<T>}
    */
-  public sort(callback?: (a: T, b: T) => -1 | 0 | 1) {
-    return new Collection<T>(this.items.sort(callback));
+  public sort(callback?: (a: T | [string, T], b: T | [string, T]) => -1 | 0 | 1) {
+    if (this.isSequentialMap()) {
+      return new Collection([...this.items.values()].sort(callback));
+    }
+
+    return new Collection(new Map([...this.items.entries()].sort(callback)));
   }
 
   /**
    * Splices a portion of the collection.
    *
-   * @param {number} start The index at which to start changing the array.
-   * @param {...*} args The elements to insert into the array at the start index.
+   * @param {number} offset The index at which to start changing the array.
+   * @param {number} deleteCount The number of elements to remove from the array.
+   * @param {...*} replacement The elements to insert into the array at the start index.
    * @returns {this}
    * @chainable
    */
-  public splice(start: number, ...args: any[]): this {
-    this.items.splice(start, ...args);
+  public splice(offset: number, deleteCount?: number, replacement: any[] = []): any[] {
+    const isSequential = this.isSequentialMap();
+    const keys = this.keys();
+    const entries = this.entries();
 
-    return this;
+    if (offset < 0) {
+      offset = entries.length + offset;
+    }
+
+    const offsetEnd = offset + (deleteCount ?? 1);
+    const deleted = entries.slice(offset, offsetEnd);
+
+    for (let i = offset; i < offsetEnd && i < entries.length; i++) {
+      const keyToDelete = keys[i];
+      this.items.delete(keyToDelete);
+    }
+
+    if (replacement.length > 0) {
+      if (isSequential) {
+        // If the Map is not sequential: insert again by index
+        const before = entries.slice(0, offset);
+        const after = entries.slice(offsetEnd);
+        const newItems = [...before.map(([, v]) => v), ...replacement, ...after.map(([, v]) => v)];
+        this.items = new Map(newItems.map((item, index) => [`${index}`, item]));
+      } else {
+        // If the Map is not sequential: assign replacement with new key (by index)
+        const result = new Map();
+        let i = 0;
+        for (let [k, v] of entries.slice(0, offset)) {
+          result.set(k, v);
+        }
+        replacement.forEach((item, index) => {
+          result.set(`${index}`, item);
+        });
+        for (let [k, v] of entries.slice(offsetEnd)) {
+          result.set(k, v);
+        }
+        this.items = result;
+      }
+    } else if (isSequential) {
+      // After deleting, need to re-index if the Map is sequential
+      const updated = Array.from(this.items.values());
+      this.items = new Map(updated.map((item, index) => [`${index}`, item]));
+    }
+
+    return isSequential ? deleted.map(([, v]) => v) : deleted;
   }
 
   /**
@@ -530,10 +774,10 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
    * @returns {Collection<T[]>} A new collection with the items split into a specified number of groups.
    */
   public split(numberOfGroups: number) {
-    const groupSize = Math.floor(this.items.length / numberOfGroups);
+    const groupSize = Math.floor(this.count() / numberOfGroups);
     const items = this.items;
     const result = [];
-    const remain = this.items.length % numberOfGroups;
+    const remain = this.count() % numberOfGroups;
     let start = 0;
 
     for (let i = 0; i < numberOfGroups; i++) {
@@ -543,8 +787,8 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
         size++;
       }
 
-      const end = i === numberOfGroups - 1 ? this.items.length : start + size;
-      result.push(items.slice(start, end));
+      const end = i === numberOfGroups - 1 ? this.count() : start + size;
+      result.push([...items.values()].slice(start, end));
       start += size;
     }
 
@@ -563,17 +807,19 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
    * @returns {number} The sum of the collection.
    */
   public sum(key?: string) {
-    return this.items.reduce<number>((total, item) => {
-      if (Array.isArray(item)) {
-        return total + item.length;
-      } else if (typeof item === 'object' && typeof item?.[key as keyof T] === 'number') {
-        return total + (item[key as keyof T] as number);
-      } else if (typeof item === 'number') {
-        return total + item;
-      }
+    return this.values()
+      .toArray()
+      .reduce<number>((total, item) => {
+        if (Array.isArray(item)) {
+          return total + item.length;
+        } else if (typeof item === 'object' && typeof item?.[key as keyof T] === 'number') {
+          return total + (item[key as keyof T] as number);
+        } else if (typeof item === 'number') {
+          return total + item;
+        }
 
-      return total + 1;
-    }, 0);
+        return total + 1;
+      }, 0);
   }
 
   /**
@@ -597,13 +843,17 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
    * @returns {any[]}
    */
   public toArray(): any[] {
-    return this.map((item: any) => {
-      if (typeof item === 'object' && item !== null && typeof item?.toArray === 'function') {
-        return item.toArray();
-      }
+    const result: any[] = [];
 
-      return item;
-    }).all();
+    this.items.forEach((item: any) => {
+      if (typeof item === 'object' && item !== null && typeof item?.toArray === 'function') {
+        result.push(item.toArray());
+      } else {
+        result.push(item);
+      }
+    });
+
+    return result;
   }
 
   /**
@@ -612,7 +862,19 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
    * @returns {string}
    */
   public toJson(): string {
-    return JSON.stringify(this.items);
+    if (this.isSequentialMap()) {
+      return JSON.stringify([...this.items.values()]);
+    }
+
+    const result: Record<string | number, unknown> = {};
+
+    this.items.forEach((value, key) => {
+      if (typeof key === 'string') {
+        result[key] = value;
+      }
+    });
+
+    return JSON.stringify(result);
   }
 
   /**
@@ -631,7 +893,20 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
    * @returns {Collection<T>}
    */
   public unique(key?: string): Collection<T> {
-    return new Collection(Arr.new(this.items).unique(key));
+    if (this.isSequentialMap()) {
+      return new Collection(Arr.new(this.items.values()).unique(key));
+    }
+
+    return this.collect();
+  }
+
+  /**
+   * Get all values of the items in the collection.
+   *
+   * @returns {Collection<T>}
+   */
+  public values(): Collection<T> {
+    return new Collection(Array.from(this.items.values()));
   }
 
   /**
@@ -666,7 +941,7 @@ export default class Collection<T> implements Arrayable<T>, Iterable<T>, Jsonabl
    * @returns {Collection<unknown>}
    */
   static wrap(item: any): Collection<unknown> {
-    item = Helper.getArrayableItems(item);
+    item = typeof item === 'object' ? item : Helper.getArrayableItems(item);
 
     return new Collection(item);
   }
