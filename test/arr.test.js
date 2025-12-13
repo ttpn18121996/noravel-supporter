@@ -21,10 +21,32 @@ test('it can chunk items of an array', () => {
   ]);
 });
 
-test('it can get a first item', () => {
-  const arr = [1, 2, 3, 4, 5, 6];
-  const chunk = _arr(arr).first();
-  expect(chunk).toEqual(1);
+describe('it can get a first item', () => {
+  test('from a non-empty array', () => {
+    const arr = [1, 2, 3, 4, 5, 6];
+    const chunk = _arr(arr).first();
+    expect(chunk).toEqual(1);
+  });
+
+  test('from an empty array', () => {
+    const arr = [];
+    const chunk = _arr(arr).first();
+    expect(chunk).toBeNull();
+  });
+});
+
+describe('it can get a last item', () => {
+  test('from a non-empty array', () => {
+    const arr = [1, 2, 3, 4, 5, 6];
+    const chunk = _arr(arr).last();
+    expect(chunk).toEqual(6);
+  });
+
+  test('from an empty array', () => {
+    const arr = [];
+    const chunk = _arr(arr).last();
+    expect(chunk).toBeNull();
+  });
 });
 
 test('it can run a map over each of the items in the array', () => {
@@ -118,6 +140,10 @@ describe('it can filter out duplicate elements to ensure that array elements are
   test('with the item is an object', () => {
     expect(_arr([{ id: 1 }, { id: 2 }, { id: 1 }]).unique('id')).toEqual([{ id: 1 }, { id: 2 }]);
   });
+
+  test('with the item is an object without a key', () => {
+    expect(_arr([{ id: 1 }, { id: 2 }, { id: 1 }]).unique()).toEqual([{ id: 1 }, { id: 2 }]);
+  });
 });
 
 describe('it can convert the array to options of a selection', () => {
@@ -141,15 +167,30 @@ describe('it can convert the array to options of a selection', () => {
 });
 
 test('it can check for emptiness', () => {
-  const items = [];
-  expect(_arr(items).isEmpty()).toBeTruthy();
+  expect(_arr([]).isEmpty()).toBeTruthy();
+  expect(_arr([1]).isEmpty()).toBeFalsy();
 });
 
 test('it can get a raw array value', () => {
   expect(_arr({ id: 1 })).toEqual([{ id: 1 }]);
 });
 
+test('it can cross join arrays', () => {
+  expect(Arr.crossJoin([1, 2], ['a', 'b'])).toEqual([
+    [1, 'a'],
+    [1, 'b'],
+    [2, 'a'],
+    [2, 'b'],
+  ]);
+});
+
+test('it can create a new array from an iterable', () => {
+  const set = new Set([1, 2, 3]);
+  expect(_arr(set)).toEqual([1, 2, 3]);
+});
+
 test('it can register a custom macro', () => {
+    Arr.macro(123, () => 'should not be registered');
   Arr.macro('custom', function () {
     return this.concat(['custom']);
   });
