@@ -2,7 +2,11 @@ const { _col } = require('../dist');
 
 describe('it can be constructed', () => {
   test('with a non-arrayable object', () => {
-    const TestClass = class { constructor() { this.a = 1 } };
+    const TestClass = class {
+      constructor() {
+        this.a = 1;
+      }
+    };
     const collection = _col(new TestClass());
     expect(collection.all()).toEqual([['a', 1]]);
   });
@@ -21,7 +25,10 @@ describe('it can get all items', () => {
 
   test('from a non-sequential collection', () => {
     const collection = _col({ a: 1, b: 2 });
-    expect(collection.all()).toEqual([['a', 1], ['b', 2]]);
+    expect(collection.all()).toEqual([
+      ['a', 1],
+      ['b', 2],
+    ]);
   });
 });
 
@@ -125,7 +132,10 @@ describe('it can cross join multiple collections', () => {
   test('with a non-sequential collection', () => {
     const collection = _col({ a: 1, b: 2 });
     const actual = collection.crossJoin([3, 4]);
-    expect(actual.all()).toEqual([['a', 1], ['b', 2]]);
+    expect(actual.all()).toEqual([
+      ['a', 1],
+      ['b', 2],
+    ]);
   });
 });
 
@@ -367,13 +377,23 @@ describe('it can merges the given items', () => {
     const collection = _col({ a: 1, b: 2 });
     const actual = _col({ c: 3, d: 4 });
     actual.merge(collection);
-    expect(actual.all()).toEqual([['c', 3], ['d', 4], ['a', 1], ['b', 2]]);
+    expect(actual.all()).toEqual([
+      ['c', 3],
+      ['d', 4],
+      ['a', 1],
+      ['b', 2],
+    ]);
   });
 
   test('with an array', () => {
     const actual = _col({ c: 3, d: 4 });
     actual.merge([1, 2]);
-    expect(actual.all()).toEqual([['c', 3], ['d', 4], ['0', 1], ['1', 2]]);
+    expect(actual.all()).toEqual([
+      ['c', 3],
+      ['d', 4],
+      ['0', 1],
+      ['1', 2],
+    ]);
   });
 });
 
@@ -393,7 +413,10 @@ describe('it can pad the collection with the given value', () => {
   test('with a non-sequential collection', () => {
     const collection = _col({ a: 1, b: 2 });
     const actual = collection.pad(5, 0);
-    expect(actual.all()).toEqual([['a', 1], ['b', 2]]);
+    expect(actual.all()).toEqual([
+      ['a', 1],
+      ['b', 2],
+    ]);
   });
 });
 
@@ -449,7 +472,11 @@ describe('it can prepend items to the collection', () => {
   test('to a non-sequential collection', () => {
     const collection = _col({ b: 2, c: 3 });
     const actual = collection.prepend(1, 'a');
-    expect(actual.all()).toEqual([['a', 1], ['b', 2], ['c', 3]]);
+    expect(actual.all()).toEqual([
+      ['a', 1],
+      ['b', 2],
+      ['c', 3],
+    ]);
   });
 });
 
@@ -461,16 +488,23 @@ describe('it can push an item to the collection', () => {
   });
 
   test('to a non-sequential collection', () => {
-    const collection = _col({ '0': 2, '2': 3 });
+    const collection = _col({ 0: 2, 2: 3 });
     const actual = collection.push('a');
-    expect(actual.all()).toEqual([['0', 2], ['2', 3], ['3', 'a']]);
+    expect(actual.all()).toEqual([
+      ['0', 2],
+      ['2', 3],
+      ['3', 'a'],
+    ]);
   });
 });
 
 test('it can put an item in the collection', () => {
   const collection = _col({ a: '1', b: '2' });
   const actual = collection.put('b', '3');
-  expect(actual.all()).toEqual([['a', '1'], ['b', '3']]);
+  expect(actual.all()).toEqual([
+    ['a', '1'],
+    ['b', '3'],
+  ]);
 });
 
 test('it can get an random item from the collection', () => {
@@ -520,7 +554,11 @@ test('it can reverse the collection', () => {
 test('it can reverse a non-sequential collection', () => {
   const collection = _col({ a: 1, b: 2, c: 3 });
   const actual = collection.reverse();
-  expect(actual.all()).toEqual([['c', 3], ['b', 2], ['a', 1]]);
+  expect(actual.all()).toEqual([
+    ['c', 3],
+    ['b', 2],
+    ['a', 1],
+  ]);
 });
 
 describe('it can shift an item from the collection', () => {
@@ -595,7 +633,11 @@ describe('it can sort the collection', () => {
       if (a[1] > b[1]) return 1;
       return 0;
     });
-    expect(actual.all()).toEqual([['a', 1], ['b', 2], ['c', 3]]);
+    expect(actual.all()).toEqual([
+      ['a', 1],
+      ['b', 2],
+      ['c', 3],
+    ]);
   });
 });
 
@@ -628,9 +670,17 @@ describe('it can splice items from the collection', () => {
 
   test('with a non-sequential collection', () => {
     const collection = _col({ a: 1, d: 4 });
-    const chunk = collection.splice(1, 0, [['b', 2], ['c', 3]]);
+    const chunk = collection.splice(1, 0, [
+      ['b', 2],
+      ['c', 3],
+    ]);
     expect(chunk).toEqual([]);
-    expect(collection.all()).toEqual([['a', 1], ['0', ['b', 2]], ['1', ['c', 3]], ['d', 4]]);
+    expect(collection.all()).toEqual([
+      ['a', 1],
+      ['0', ['b', 2]],
+      ['1', ['c', 3]],
+      ['d', 4],
+    ]);
   });
 });
 
@@ -761,7 +811,11 @@ describe('it can filter out duplicates', () => {
   test('with a non-sequential collection', () => {
     const collection = _col({ a: 1, b: 2, c: 1 });
     const actual = collection.unique();
-    expect(actual.all()).toEqual([['a', 1], ['b', 2], ['c', 1]]);
+    expect(actual.all()).toEqual([
+      ['a', 1],
+      ['b', 2],
+      ['c', 1],
+    ]);
   });
 });
 
@@ -775,7 +829,10 @@ describe('it can execute a callback when a condition is truthy', () => {
 
   test('with a function that satisfies the condition', () => {
     const collection = _col().range(1, 5);
-    const actual = collection.when(col => col.count() > 3, col => col.filter(value => value > 3).values());
+    const actual = collection.when(
+      col => col.count() > 3,
+      col => col.filter(value => value > 3).values(),
+    );
     expect(actual.all()).toEqual([4, 5]);
   });
 
@@ -810,7 +867,11 @@ describe('it can create a new collection with the param is not an array', () => 
   });
 
   test('with a non-arrayable object', () => {
-    const TestClass = class { constructor() { this.a = 1 } };
+    const TestClass = class {
+      constructor() {
+        this.a = 1;
+      }
+    };
     const collection = _col(new TestClass());
     expect(collection.all()).toEqual([['a', 1]]);
   });

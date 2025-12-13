@@ -190,7 +190,7 @@ test('it can create a new array from an iterable', () => {
 });
 
 test('it can register a custom macro', () => {
-    Arr.macro(123, () => 'should not be registered');
+  Arr.macro(123, () => 'should not be registered');
   Arr.macro('custom', function () {
     return this.concat(['custom']);
   });
