@@ -878,11 +878,23 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
   }
 
   /**
-   * An alias of toJson method.
+   * Return a string representation of the collection.
    *
    * @returns {string}
    */
   public toString(): string {
+    if (this.isSequentialMap()) {
+      return this.all()
+        .map(item => {
+          if (typeof item === 'object' && item !== null && 'toJson' in item && typeof item?.toJson === 'function') {
+            return item.toJson();
+          }
+
+          return String(item);
+        })
+        .join(',');
+    }
+
     return this.toJson();
   }
 
