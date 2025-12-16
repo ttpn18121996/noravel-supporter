@@ -1432,6 +1432,44 @@ const json = collection.toJson();
 console.log(json); // "[1,2,3,4,5]"
 ```
 
+### \_col().toString()
+
+The `toString` method is similar to the `toJson` method,
+except that for a sequential map collection, it returns a string containing the collection values ​​separated by commas.
+
+```js
+const string = _col([1, 2, 3, 4, 5]).toString();
+console.log(string); // "1,2,3,4,5"
+```
+
+Equivalent
+
+```js
+const string = _col([1, 2, 3, 4, 5]).all().join(',');
+console.log(string); // "1,2,3,4,5"
+```
+
+In the case where the collection items are objects, it will prioritize checking the `toJson` method first.
+If there is no `toJson` method, it will convert the object to a JSON string.
+
+```js
+const users = [
+  {
+    id: 1,
+    name: 'User 1',
+  },
+  {
+    id: 2,
+    name: 'User 2',
+  },
+];
+const collection = _col(users).map(user => ({
+  ...user,
+  toJson: () => JSON.stringify(this),
+})).toString();
+// {"id":1,"name":"User 1"},{"id":2,"name":"User 2"}
+```
+
 ### \_col().unique()
 
 The `unique` method returns all of the unique items in the collection.
