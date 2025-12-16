@@ -886,12 +886,7 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
     if (this.isSequentialMap()) {
       return this.all()
         .map(item => {
-          if (
-            typeof item === 'object'
-            && item !== null
-            && 'toJson' in item
-            && typeof item?.toJson === 'function'
-          ) {
+          if (typeof item === 'object' && item !== null && 'toJson' in item && typeof item?.toJson === 'function') {
             return item.toJson();
           }
 
