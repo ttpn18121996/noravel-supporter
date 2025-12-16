@@ -179,6 +179,12 @@ describe('it can determine whether all elements in the collection satisfy a cond
     const actual = collection.every(value => value < 6);
     expect(actual).toBeTruthy();
   });
+
+  test('with a collection that does not satisfy the condition', () => {
+    const collection = _col().range(1, 5);
+    const actual = collection.every(value => value < 4);
+    expect(actual).toBeFalsy();
+  });
 });
 
 describe('it can filter a collection', () => {
@@ -232,6 +238,25 @@ test('it can paginate a collection', () => {
   const collection = _col().range(1, 5);
   const actual = collection.forPage(2, 2);
   expect(actual.all()).toEqual([3, 4]);
+});
+
+describe('it can get an item from the collection', () => {
+  const collection = _col({ a: 1, b: 2 });
+
+  test('with an existing key', () => {
+    const actual = collection.get('a');
+    expect(actual).toEqual(1);
+  });
+
+  test('with a non-existing key and no default value', () => {
+    const actual = collection.get('c');
+    expect(actual).toBeUndefined();
+  });
+
+  test('with a non-existing key and a default value', () => {
+    const actual = collection.get('c', 3);
+    expect(actual).toEqual(3);
+  });
 });
 
 test('it can group a collection by a given key', () => {
@@ -755,16 +780,44 @@ test('it can cast a collection to an array', () => {
   ]);
 });
 
-test('it can cast a collection to a json', () => {
-  const collection = _col({ a: 1, b: 2, 3: 'c' });
-  const actual = collection.toJson();
-  expect(actual).toEqual('{"3":"c","a":1,"b":2}');
+describe('it can cast a collection to a json', () => {
+  test('with a non-sequential collection', () => {
+    const collection = _col({ a: 1, b: 2, 3: 'c' });
+    const actual = collection.toJson();
+    expect(actual).toEqual('{"3":"c","a":1,"b":2}');
+  });
+
+  test('with a sequential collection', () => {
+    const collection = _col(['a', 'b', 'c']);
+    const actual = collection.toJson();
+    expect(actual).toEqual('["a","b","c"]');
+  });
 });
 
-test('it can cast a collection to a string', () => {
-  const collection = _col().range(1, 5);
-  const actual = collection.toString();
-  expect(actual).toEqual('[1,2,3,4,5]');
+describe('it can cast a collection to a string', () => {
+  test('with a sequential collection of primitives', () => {
+    const collection = _col().range(1, 5);
+    expect(collection.toString()).toEqual('1,2,3,4,5');
+  });
+
+  test('with a sequential collection of objects with a toJson method', () => {
+    const obj1 = { toJson: () => '{"name":"John"}' };
+    const obj2 = { toJson: () => '{"name":"Jane"}' };
+    const collection = _col([obj1, obj2]);
+    expect(collection.toString()).toEqual('{"name":"John"},{"name":"Jane"}');
+  });
+
+  test('with a non-sequential collection', () => {
+    const collection = _col({ a: 1, b: 2 });
+    expect(collection.toString()).toEqual(JSON.stringify({ a: 1, b: 2 }));
+  });
+
+  test('with a sequential collection of mixed items', () => {
+    const objWithToJson = { toJson: () => '{"name":"John"}' };
+    const objWithoutToJson = { name: 'Doe' };
+    const collection = _col([1, 'hello', objWithToJson, objWithoutToJson, null, undefined]);
+    expect(collection.toString()).toEqual('1,hello,{"name":"John"},[object Object],null,undefined');
+  });
 });
 
 describe('it can filter out duplicates', () => {
