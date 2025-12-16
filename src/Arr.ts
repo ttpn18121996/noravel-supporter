@@ -130,10 +130,10 @@ export default class Arr extends Array {
    * Add elements to ensure the length of the array.
    *
    * @param {number} range Expected array length.
-   * @param value The value of the element will be added.
+   * @param {any} value The value of the element will be added.
    * @returns {Arr}
    */
-  public supplement(range: number, value = null): Arr {
+  public supplement(range: number, value: any = null): Arr {
     while (this.length < range) {
       this.push(value);
     }

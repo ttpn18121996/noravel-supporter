@@ -914,13 +914,13 @@ console.log(diff.all()); // [1, 3, 5]
 
 ### \_col().each()
 
-This will iterate over the items in the collection and pass each item to the given closure.
+This will iterate over the items in the collection and pass each item to the given callback.
 
 ```js
 _col([1, 2, 3]).each(value => console.log(value)); // 1 2 3
 ```
 
-If you would like to stop iterating through the items, you may return false from your closure.
+If you would like to stop iterating through the items, you may return false from your callback.
 
 ```js
 _col([1, 2, 3, 4, 5]).each(value => {
