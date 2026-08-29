@@ -1,6 +1,6 @@
 {
   "name": "@noravel/supporter",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "description": "This is a support library for my personal projects.",
   "repository": {
     "type": "git",
@@ -19,9 +19,8 @@
     "prettier:check": "prettier --ignore-path .prettierignore --check '**/*.{js,ts,json,md}'",
     "prettier:fix": "prettier --ignore-path .prettierignore --write '**/*.{js,ts,json,md}'",
     "gyp:build": "npx node-gyp rebuild --directory=native",
-    "postinstall": "npm run gyp:build",
-    "prebuild": "prebuildify --napi --strip",
-    "install": "node-gyp-build"
+    "prebuild": "prebuildify --napi --strip --cwd native",
+    "install": "node-gyp-build native"
   },
   "files": [
     "dist"
