@@ -38,6 +38,9 @@ jobs:
 
     - name: "Build TypeScript"
       run: npm run build
+
+    - name: "Verify dist directory exists"
+      run: ls -la dist/
     
     - name: "Run jest"
-      run: npx jest --no-cache
+      run: npm run test
