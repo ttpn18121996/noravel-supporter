@@ -6,5 +6,5 @@ module.exports = {
 
   moduleDirectories: ['node_modules', '<rootDir>'],
   moduleFileExtensions: ['js', 'ts', 'json', 'node'],
-  testMatch: ['**/test/**/*.test.js']
+  testMatch: ['**/test/**/*.test.js'],
 };
