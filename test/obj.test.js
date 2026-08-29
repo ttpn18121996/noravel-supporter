@@ -1,5 +1,4 @@
-const path = require('path');
-const { _obj } = require(path.resolve(__dirname, '..', 'dist', 'index.js'));
+const { _obj } = require('../dist');
 
 describe('it can combine a key list and a value list into one object', () => {
   test('with equal length keys and length values', () => {

@@ -1,7 +1,4 @@
-const path = require('path');
-const { _col, getArray, Helper, isConstructor, isJSON, queryStringToObject, typeOf } = require(
-  path.resolve(__dirname, '..', 'dist'),
-);
+const { _col, getArray, Helper, isConstructor, isJSON, queryStringToObject, typeOf } = require('../dist');
 
 describe('it is set', () => {
   test('with value is not undefined', () => {
