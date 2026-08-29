@@ -3,5 +3,5 @@ module.exports = {
   moduleFileExtensions: ['js', 'ts', 'json', 'node'],
   testMatch: ['**/test/**/*.test.js'],
 
-  transformIgnorePatterns: ['/node_modules/', '/dist/']
+  transformIgnorePatterns: ['/node_modules/', '/dist/'],
 };
