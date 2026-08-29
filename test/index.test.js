@@ -1,6 +1,6 @@
 const path = require('path');
 const { _col, getArray, Helper, isConstructor, isJSON, queryStringToObject, typeOf } = require(
-  path.resolve(__dirname, '../dist'),
+  path.resolve(__dirname, '..', 'dist'),
 );
 
 describe('it is set', () => {

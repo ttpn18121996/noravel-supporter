@@ -33,8 +33,11 @@ jobs:
     - name: "Install npm dependencies"
       run: npm ci
 
+    - name: "Build Native C++ Addon"
+      run: npm run gyp:build
+
     - name: "Build TypeScript"
       run: npm run build
-    
+
     - name: "Run jest"
       run: npm run test
