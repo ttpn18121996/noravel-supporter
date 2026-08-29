@@ -3,8 +3,8 @@ import path from 'node:path';
 import StringHelper, { RandomOptions } from './Support/StringHelper';
 import { Stringable } from './types';
 
-const addonPath = path.resolve(__dirname, '../native/build/Release/supporter_addon.node');
-const addon = require(addonPath);
+const loadBinding = require('node-gyp-build');
+const addon = loadBinding(path.resolve(__dirname, '..'));
 
 export default class Str implements Stringable {
   public value: String;
