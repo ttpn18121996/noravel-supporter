@@ -1,7 +1,10 @@
 module.exports = {
   testEnvironment: 'node',
-  moduleFileExtensions: ['js', 'ts', 'json', 'node'],
-  testMatch: ['**/test/**/*.test.js'],
 
   transformIgnorePatterns: ['/node_modules/', '/dist/'],
+  cache: false,
+
+  moduleDirectories: ['node_modules', '<rootDir>'],
+  moduleFileExtensions: ['js', 'ts', 'json', 'node'],
+  testMatch: ['**/test/**/*.test.js']
 };
