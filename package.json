@@ -1,6 +1,6 @@
 {
   "name": "@noravel/supporter",
-  "version": "2.4.9",
+  "version": "2.4.10",
   "description": "This is a support library for my personal projects.",
   "repository": {
     "type": "git",
@@ -13,15 +13,16 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
+    "gyp:build": "node-gyp rebuild",
+    "prebuild": "prebuildify --napi --strip",
+    "build:all": "npm run gyp:build && npm run build",
+    "prepublishOnly": "npm run gyp:build && npm run build && npm run prebuild",
+    "install": "node-gyp-build",
     "test": "jest",
     "test:coverage": "jest --verbose --coverage",
     "postversion": "git push --tags && npm publish --new-version $npm_package_version && git push && echo \"Successfully released version $npm_package_version!\"",
     "prettier:check": "prettier --ignore-path .prettierignore --check '**/*.{js,ts,json,md}'",
-    "prettier:fix": "prettier --ignore-path .prettierignore --write '**/*.{js,ts,json,md}'",
-    "gyp:build": "node-gyp rebuild",
-    "prebuild": "prebuildify --napi --strip",
-    "prepublishOnly": "npm run gyp:build && npm run build && npm run prebuild",
-    "install": "node-gyp-build"
+    "prettier:fix": "prettier --ignore-path .prettierignore --write '**/*.{js,ts,json,md}'"
   },
   "files": [
     "dist",
@@ -29,7 +30,6 @@
     "binding.gyp",
     "native"
   ],
-  "prepare": "npm run build",
   "author": "Trịnh Trần Phương Nam <ttpn18121996@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/ttpn18121996/noravel-supporter",
