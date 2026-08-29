@@ -1,5 +1,10 @@
+import path from 'node:path';
+
 import StringHelper, { RandomOptions } from './Support/StringHelper';
 import { Stringable } from './types';
+
+const loadBinding = require('node-gyp-build');
+const addon = loadBinding(path.resolve(__dirname, '..'));
 
 export default class Str implements Stringable {
   public value: String;
@@ -357,6 +362,49 @@ export default class Str implements Stringable {
     this.value = this.value.toUpperCase();
 
     return this;
+  }
+
+  /**
+   * Convert the Markdown text to HTML.
+   * @param {boolean} minify default false
+   * @returns {this}
+   */
+  public mdToHtml(minify: boolean = false): this {
+    this.value = Str.syncMdToHtml(this.value, minify);
+
+    return this;
+  }
+
+  /**
+   * Log the current value to the console.
+   * @returns {this}
+   */
+  public dump(): this {
+    console.log(this.value);
+
+    return this;
+  }
+
+  /**
+   * Convert the Markdown text to HTML asynchronously.
+   * @param md The markdown text
+   * @param {boolean} minify default false
+   * @returns {Promise<string>}
+   */
+  public static async mdToHtml(md: any, minify: boolean = false): Promise<string> {
+    const input = new Str(md);
+    return addon.mdToHtml(input.toString(), minify);
+  }
+
+  /**
+   * Convert the Markdown text to HTML.
+   * @param md The markdown text
+   * @param {boolean} minify default false
+   * @returns {string}
+   */
+  public static syncMdToHtml(md: any, minify: boolean = false): string {
+    const input = new Str(md);
+    return addon.syncMdToHtml(input.toString(), minify);
   }
 
   /**

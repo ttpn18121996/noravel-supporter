@@ -2,3 +2,5 @@
 .DS_Store
 /dist
 /coverage
+build/
+*.node

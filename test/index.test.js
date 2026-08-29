@@ -1,55 +1,58 @@
-const { _col, isset, empty, typeOf, isJSON, queryStringToObject, getArray, isConstructor } = require('../dist');
+const path = require('path');
+const { _col, getArray, Helper, isConstructor, isJSON, queryStringToObject, typeOf } = require(
+  path.resolve(__dirname, '../dist'),
+);
 
 describe('it is set', () => {
   test('with value is not undefined', () => {
     let a;
-    expect(isset(a)).toBeFalsy();
+    expect(Helper.isset(a)).toBeFalsy();
   });
 
   test('with value is not null', () => {
     const a = null;
-    expect(isset(a)).toBeFalsy();
+    expect(Helper.isset(a)).toBeFalsy();
   });
 });
 
 describe('it is empty', () => {
   test('with value is undefined', () => {
     let a;
-    expect(empty(a)).toBeTruthy();
+    expect(Helper.empty(a)).toBeTruthy();
   });
 
   test('with value is null', () => {
     const a = null;
-    expect(empty(a)).toBeTruthy();
+    expect(Helper.empty(a)).toBeTruthy();
   });
 
   test('with value is an empty string', () => {
     const a = '';
-    expect(empty(a)).toBeTruthy();
+    expect(Helper.empty(a)).toBeTruthy();
   });
 
   test('with value is an empty array', () => {
     const a = [];
-    expect(empty(a)).toBeTruthy();
+    expect(Helper.empty(a)).toBeTruthy();
   });
 
   test('with value is 0', () => {
     const a = 0;
-    expect(empty(a)).toBeTruthy();
+    expect(Helper.empty(a)).toBeTruthy();
   });
 
   test('with value is false', () => {
     const a = false;
-    expect(empty(a)).toBeTruthy();
+    expect(Helper.empty(a)).toBeTruthy();
   });
 
   test('with value is an empty object', () => {
     const a = { count: () => 0 };
     const b = { isEmpty: () => true };
     const c = {};
-    expect(empty(a)).toBeTruthy();
-    expect(empty(b)).toBeTruthy();
-    expect(empty(c)).toBeTruthy();
+    expect(Helper.empty(a)).toBeTruthy();
+    expect(Helper.empty(b)).toBeTruthy();
+    expect(Helper.empty(c)).toBeTruthy();
   });
 });
 

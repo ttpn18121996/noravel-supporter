@@ -5,10 +5,111 @@ This is a support library for Nam's projects.
 # Content
 
 - [Object](#object)
+  - [_obj.combine()](#_objcombine)
+  - [_obj.get()](#_objget)
+  - [_obj.set()](#_objset)
+  - [_obj.only()](#_objonly)
+  - [_obj.except()](#_objexcept)
+  - [_obj.has()](#_objhas)
+  - [_obj.map()](#_objmap)
+  - [_obj.toQueryString()](#_objtoquerystring)
+  - [_obj.replicate()](#_objreplicate)
 - [Array](#array)
+  - [_arr().chunk()](#_arrchunk)
+  - [_arr().collapse()](#_arrcollapse)
+  - [_arr().first()](#_arrfirst)
+  - [_arr().mapToGroups()](#_arrmaptogroups)
+  - [_arr().pluck()](#_arrpluck)
+  - [_arr().range()](#_arrrange)
+  - [_arr().supplement()](#_arrsupplement)
+  - [_arr().unique()](#_arrunique)
+  - [_arr().toSelectOptions()](#_arrtoselectoptions)
+  - [_arr().isEmpty()](#_arrisempty)
+  - [_arr().dump()](#_arrdump)
 - [String](#string)
+  - [_str().get()](#_strget)
+  - [_str().length()](#_strlength)
+  - [_str().after()](#_strafter)
+  - [_str().afterLast()](#_strafterlast)
+  - [_str().before()](#_strbefore)
+  - [_str().beforeLast()](#_strbeforelast)
+  - [_str().between()](#_strbetween)
+  - [_str().betweenFirst()](#_strbetweenfirst)
+  - [_str().bind()](#_strbind)
+  - [_str().append()](#_strappend)
+  - [_str().prepend()](#_strprepend)
+  - [_str().title()](#_strtitle)
+  - [_str().studly()](#_strstudly)
+  - [_str().camel()](#_strcamel)
+  - [_str().lower()](#_strlower)
+  - [_str().upper()](#_strupper)
+  - [_str().nonUnicode()](#_strnonunicode)
+  - [_str().snake()](#_strsnake)
+  - [_str().kebab()](#_strkebab)
+  - [_str().escapeHtml()](#_strescapehtml)
+  - [_str().limit()](#_strlimit)
+  - [_str().random()](#_strrandom)
+  - [_str().shuffle()](#_strshuffle)
+  - [_str().replace()](#_strreplace)
+  - [_str().replaceAt()](#_strreplaceat)
+  - [_str().splice()](#_strsplice)
+  - [_str().slice()](#_strslice)
+  - [_str().padStart()](#_strpadstart)
+  - [_str().padEnd()](#_strpadend)
+  - [_str().ltrim()](#_strltrim)
+  - [_str().rtrim()](#_strrtrim)
+  - [_str().trim()](#_strtrim)
 - [Collection](#collection)
+  - [_col().all()](#_colall)
+  - [_col().chunk()](#_colchunk)
+  - [_col().collapse()](#_colcollapse)
+  - [_col().collect()](#_colcollect)
+  - [_col().concat()](#_colconcat)
+  - [_col().contains()](#_colcontains)
+  - [_col().count()](#_colcount)
+  - [_col().crossJoin()](#_colcrossjoin)
+  - [_col().diff()](#_coldiff)
+  - [_col().each()](#_coleach)
+  - [_col().every()](#_colevery)
+  - [_col().filter()](#_colfilter)
+  - [_col().first()](#_colfirst)
+  - [_col().forPage()](#_colforpage)
+  - [_col().groupBy()](#_colgroupby)
+  - [_col().intersect()](#_colintersect)
+  - [_col().isEmpty()](#_colisempty)
+  - [_col().isNotEmpty()](#_colisnotempty)
+  - [_col().last()](#_collast)
+  - [_col().map()](#_colmap)
+  - [_col().mapToGroups()](#_colmaptogroups)
+  - [_col().merge()](#_colmerge)
+  - [_col().pad()](#_colpad)
+  - [_col().pluck()](#_colpluck)
+  - [_col().pop()](#_colpop)
+  - [_col().prepend()](#_colprepend)
+  - [_col().push()](#_colpush)
+  - [_col().random()](#_colrandom)
+  - [_col().range()](#_colrange)
+  - [_col().reverse()](#_colreverse)
+  - [_col().shift()](#_colshift)
+  - [_col().shuffle()](#_colshuffle)
+  - [_col().slice()](#_colslice)
+  - [_col().sort()](#_colsort)
+  - [_col().splice()](#_colsplice)
+  - [_col().sum()](#_colsum)
+  - [_col().tap()](#_coltap)
+  - [_col().toArray()](#_coltoarray)
+  - [_col().toJson()](#_coltojson)
+  - [_col().toString()](#_coltostring)
+  - [_col().unique()](#_colunique)
+  - [_col().when()](#_colwhen)
 - [Helper](#helper)
+  - [isset()](#isset)
+  - [empty()](#empty)
+  - [getArray()](#getarray)
+  - [typeOf()](#typeof)
+  - [isConstructor](#isconstructor)
+  - [isJSON()](#isjson)
+  - [queryStringToObject()](#querystringtoobject)
 
 ## Object
 
@@ -20,7 +121,7 @@ const { _obj } = require('@noravel/supporter');
 import { _obj } from '@noravel/supporter';
 ```
 
-### \_obj.combine()
+### \_obj.combine
 
 Create a new object with each key associated with each corresponding value.
 
@@ -70,7 +171,7 @@ console.log(_obj.combine(keys, values));
 */
 ```
 
-### \_obj.get()
+### \_obj.get
 
 Get an item from an array using "dot" notation.
 
@@ -88,7 +189,7 @@ console.log(_obj.get(data, 'user.email', 'namttp@example.com')); // 'namttp@exam
 console.log(_obj.get(data, 'user.email', () => 'We can pass the callback here.')); // 'We can pass the callback here.'
 ```
 
-### \_obj.set()
+### \_obj.set
 
 Set an object item to a given value using "dot" notation.
 
@@ -107,7 +208,7 @@ _obj.set(data, 'user.email', 'namttp@example.com');
 console.log(_obj.get(data, 'user.email')); // 'namttp@example.com'
 ```
 
-### \_obj.only()
+### \_obj.only
 
 Get a subset of the items from the given object.
 
@@ -123,7 +224,7 @@ console.log(_obj.only(user, 'id')); // { id: 1 }
 console.log(_obj.only(user, ['id', 'name'])); // { id: 1, name: 'Trinh Tran Phuong Nam' }
 ```
 
-### \_obj.except()
+### \_obj.except
 
 Get all of the given object except for a specified object of keys.
 
@@ -138,7 +239,7 @@ console.log(_obj.except(user, 'email')); // { id: 1, name: 'Trinh Tran Phuong Na
 console.log(_obj.except(user, ['name', 'email'])); // { id: 1 }
 ```
 
-### \_obj.has()
+### \_obj.has
 
 Deeply check whether the properties exist or not.
 
@@ -154,7 +255,7 @@ console.log(_obj.has(user, 'address.city')); // true
 console.log(_obj.has(user, 'address.district')); // false
 ```
 
-### \_obj.map()
+### \_obj.map
 
 Run a map over each of the properties in the object.
 
@@ -177,7 +278,7 @@ console.log(links); // ['https://domain.example/', 'https://domain.example/about
 console.log(actions); // ['HomeController@home', 'HomeController@about']
 ```
 
-### \_obj.toQueryString()
+### \_obj.toQueryString
 
 Convert an object to a query string with each property.
 
@@ -187,7 +288,7 @@ const filters = { search: { name: 'Nam' }, sort_field: 'id', sort_direction: 'de
 console.log(_obj.toQueryString(filters)); // '?search[name]=Nam&sort_field=id&sort_direction=desc'
 ```
 
-### \_obj.replicate()
+### \_obj.replicate
 
 Clone the object into a new, non-existing instance.
 
@@ -208,7 +309,7 @@ const { _arr } = require('@noravel/supporter');
 import { _arr } from '@noravel/supporter';
 ```
 
-### \_arr().chunk()
+### \_arr().chunk
 
 Chunk the array into chunks of the given size.
 
@@ -218,7 +319,7 @@ const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 console.log(_arr(data).chunk(2)); // [[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]]
 ```
 
-### \_arr().collapse()
+### \_arr().collapse
 
 Collapse the array into a single array.
 
@@ -228,7 +329,7 @@ const data = [[1, 2, 3], [4, 5, 6, 7], [8, 9], [10]];
 console.log(_arr(data).collapse()); // [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 ```
 
-### \_arr().first()
+### \_arr().first
 
 Returns the first element of the array.
 
@@ -238,7 +339,7 @@ const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 console.log(_arr(data).first()); // 1
 ```
 
-### \_arr().mapToGroups()
+### \_arr().mapToGroups
 
 Run a grouping map over the items. The callback should return an array with a single key/value pair.
 
@@ -267,7 +368,7 @@ console.log(_arr(users).mapToGroups(user => [user.department, user.name]));
 */
 ```
 
-### \_arr().pluck()
+### \_arr().pluck
 
 Pluck an array of values from an array.
 
@@ -286,7 +387,7 @@ const users = [
 console.log(_arr(users).pluck('id')); // [1, 2]
 ```
 
-### \_arr().range()
+### \_arr().range
 
 Creates an array of numbers processing from "start" up to "end" (including "end").
 
@@ -299,7 +400,7 @@ console.log(_arr().range(10, 1)); // [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
 console.log(_arr().range(10, 1, 2)); // [10, 8, 6, 4, 2]
 ```
 
-### \_arr().supplement()
+### \_arr().supplement
 
 Add elements to ensure the length of the array.
 
@@ -310,7 +411,7 @@ console.log(_arr(data).supplement(5)); // ['a', 'b', 'c', null, null]
 console.log(_arr(data).supplement(5, 'additional item')); // ['a', 'b', 'c', 'additional item', 'additional item']
 ```
 
-### \_arr().unique()
+### \_arr().unique
 
 Filter out duplicate elements to ensure that array elements are unique.
 
@@ -352,7 +453,7 @@ console.log(_arr(users).unique('id'));
 */
 ```
 
-### \_arr().toSelectOptions()
+### \_arr().toSelectOptions
 
 The first parameter is an array with 2 elements,
 the first element is the name of the key that will be taken as the value of the option
@@ -429,28 +530,13 @@ console.log(_arr(status).toSelectOptions());
 */
 ```
 
-### \_arr().isEmpty()
+### \_arr().isEmpty
 
 Check for empty array.
 
 ```js
 console.log(_arr([]).isEmpty()); // true
 console.log(_arr([]).supplement(10).isEmpty()); // false
-```
-
-### \_arr().dump()
-
-You can log the results of each processing segment for easy debugging.
-
-```js
-_arr()
-  .range(3)
-  .dump()
-  .map(i => i + 1)
-  .dump();
-
-// [0, 1, 2]
-// [1, 2, 3]
 ```
 
 ## String
@@ -463,7 +549,7 @@ const { _str } = require('@noravel/supporter');
 import { _str } from '@noravel/supporter';
 ```
 
-### \_str().get()
+### \_str().get
 
 Get the raw string value.
 
@@ -481,7 +567,7 @@ You can also get a substring from the start position to the end position.
 console.log(_str('Lorem ipsum').get(6, 11)); // 'ipsum'
 ```
 
-### \_str().length()
+### \_str().length
 
 Get the length of the string.
 
@@ -489,7 +575,7 @@ Get the length of the string.
 console.log(_str('Nam').length()); // 3
 ```
 
-### \_str().after()
+### \_str().after
 
 Return the remainder of a string after the first occurrence of a given value.
 
@@ -497,7 +583,7 @@ Return the remainder of a string after the first occurrence of a given value.
 console.log(_str('This is my name').after(' ').get()); // 'is my name'
 ```
 
-### \_str().afterLast()
+### \_str().afterLast
 
 Return the remainder of a string after the last occurrence of a given value.
 
@@ -505,7 +591,7 @@ Return the remainder of a string after the last occurrence of a given value.
 console.log(_str('/path/to/filename.extension').afterLast('/').get()); // 'filename.extension'
 ```
 
-### \_str().before()
+### \_str().before
 
 Get the portion of a string before the first occurrence of a given value.
 
@@ -513,7 +599,7 @@ Get the portion of a string before the first occurrence of a given value.
 console.log(_str('This is my name').before(' ').get()); // 'This'
 ```
 
-### \_str().beforeLast()
+### \_str().beforeLast
 
 Get the portion of a string before the last occurrence of a given value.
 
@@ -521,7 +607,7 @@ Get the portion of a string before the last occurrence of a given value.
 console.log(_str('This is my name').beforeLast(' ').get()); // 'This is my'
 ```
 
-### \_str().between()
+### \_str().between
 
 Get the portion of a string between two given values.
 
@@ -529,7 +615,7 @@ Get the portion of a string between two given values.
 console.log(_str('This is my name').between('This', 'name').get()); // ' is my '
 ```
 
-### \_str().betweenFirst()
+### \_str().betweenFirst
 
 Get the smallest possible portion of a string between two given values.
 
@@ -538,7 +624,7 @@ console.log(_str('[a] bc [d]').betweenFirst('[', ']').get()); // 'a'
 console.log(_str('[a] bc [d]').between('[', ']').get()); // 'a] bc [d'
 ```
 
-### \_str().bind()
+### \_str().bind
 
 Binds the values ​​to the given string.
 
@@ -565,7 +651,7 @@ console.log(_str(url).bind(user.user_id, post.post_id).get()); // '/api/users/1/
 console.log(_str(url).bind([user.user_id, post.post_id]).get()); // '/api/users/1/post/1812/edit'
 ```
 
-### \_str().append()
+### \_str().append
 
 Append the given values to the string.
 
@@ -573,7 +659,7 @@ Append the given values to the string.
 console.log(_str('This is').append(' my name').get()); // 'This is my name'
 ```
 
-### \_str().prepend()
+### \_str().prepend
 
 Prepend the given values to the string.
 
@@ -581,7 +667,7 @@ Prepend the given values to the string.
 console.log(_str('/api/users').prepend('https://domain.example').get()); // 'https://domain.example/api/users'
 ```
 
-### \_str().title()
+### \_str().title
 
 Convert the given string to proper case.
 
@@ -589,7 +675,7 @@ Convert the given string to proper case.
 console.log(_str('trinh tran phuong nam').title().get()); // 'Trinh Tran Phuong Nam'
 ```
 
-### \_str().studly()
+### \_str().studly
 
 Convert a value to studly caps case.
 
@@ -597,7 +683,7 @@ Convert a value to studly caps case.
 console.log(_str('phuong_nam').studly().get()); // 'PhuongNam'
 ```
 
-### \_str().camel()
+### \_str().camel
 
 Convert a value to camel case.
 
@@ -605,7 +691,7 @@ Convert a value to camel case.
 console.log(_str('phuong_nam').camel().get()); // 'phuongNam'
 ```
 
-### \_str().lower()
+### \_str().lower
 
 Convert the given string to lower-case.
 
@@ -613,7 +699,7 @@ Convert the given string to lower-case.
 console.log(_str('NAM').lower().get()); // 'nam'
 ```
 
-### \_str().upper()
+### \_str().upper
 
 Convert the given string to upper-case.
 
@@ -621,7 +707,7 @@ Convert the given string to upper-case.
 console.log(_str('nam').upper().get()); // 'NAM'
 ```
 
-### \_str().nonUnicode()
+### \_str().nonUnicode
 
 Remove Vietnamese unicode characters from the string.
 
@@ -629,7 +715,7 @@ Remove Vietnamese unicode characters from the string.
 console.log(_str('Trịnh Trần Phương Nam').nonUnicode().get()); // 'Trinh Tran Phuong Nam'
 ```
 
-### \_str().snake()
+### \_str().snake
 
 Convert a string to snake case.
 
@@ -639,7 +725,7 @@ console.log(_str('trinhTranPhuongNam').snake().get()); // 'trinh_tran_phuong_nam
 console.log(_str('trinhTranPhuongNam').snake('-').get()); // 'trinh-tran-phuong-nam'
 ```
 
-### \_str().kebab()
+### \_str().kebab
 
 Convert a string to kebab case.
 
@@ -647,7 +733,7 @@ Convert a string to kebab case.
 console.log(_str('trinhTranPhuongNam').kebab().get()); // 'trinh-tran-phuong-nam'
 ```
 
-### \_str().escapeHtml()
+### \_str().escapeHtml
 
 Escape HTML character.
 
@@ -655,7 +741,7 @@ Escape HTML character.
 console.log(_str('<p>Hello world</p>').escapeHtml().get()); // '&lt;p&gt;Hello world&lt;/p&gt;'
 ```
 
-### \_str().limit()
+### \_str().limit
 
 Limit the number of characters in a string.
 
@@ -663,7 +749,7 @@ Limit the number of characters in a string.
 console.log(_str('The quick brown fox jumps over the lazy dog').limit(20).get()); // 'The quick brown fox...'
 ```
 
-### \_str().random()
+### \_str().random
 
 Generate a more truly "random" string. The `includeSymbols` option includes the following characters:
 
@@ -688,7 +774,7 @@ const password = _str().random(20, options);
 console.log(password); // '6!?iR(2)iQW}>UY})owi'
 ```
 
-### \_str().shuffle()
+### \_str().shuffle
 
 Randomly shuffles a string.
 
@@ -696,7 +782,7 @@ Randomly shuffles a string.
 console.log(_str('abcdefghijklmnopqrstuvwxyz').shuffle().get()); // 'zjmpnleuqfcsakigwhoxrdytbv'
 ```
 
-### \_str().replace()
+### \_str().replace
 
 Replace the given value in the given string.
 
@@ -708,7 +794,7 @@ console.log(
 ); // 'Hi everyone'
 ```
 
-### \_str().replaceAt()
+### \_str().replaceAt
 
 Replace the given value in the given string from a specific position.
 
@@ -716,7 +802,7 @@ Replace the given value in the given string from a specific position.
 console.log(_str('Hello everyone').replaceAt(2, '!!').get()); // 'He!!o everyone'
 ```
 
-### \_str().splice()
+### \_str().splice
 
 Split a string from a specific position and then insert the splice into the slice.
 
@@ -724,7 +810,7 @@ Split a string from a specific position and then insert the splice into the slic
 console.log(_str('Hello everyone!!!').splice(6, 8, '**everyone**').get()); // 'Hello **everyone**!!!'
 ```
 
-### \_str().slice()
+### \_str().slice
 
 Extracts a section of this string and returns it as a new string.
 The start value is the position taken from and the end value is the position taken to.
@@ -741,7 +827,7 @@ console.log(_str(str).slice(-9, -5).get()); // 'lazy'
 console.log(_str(str).slice(-9).upper().slice(0, 8).get()); // 'LAZY DOG'
 ```
 
-### \_str().padStart()
+### \_str().padStart
 
 Pads a given value in front of a given string until the given length is reached.
 
@@ -758,7 +844,7 @@ const marked = _str(email)
 console.log(marked); // '***ttp@example.com'
 ```
 
-### \_str().padEnd()
+### \_str().padEnd
 
 Pads a given value behind a given string until the given length is reached.
 
@@ -767,7 +853,7 @@ console.log(_str('200').padEnd(10, '-').get()); // '200-------'
 console.log(_str('200').padEnd(5).get()); // '200     '
 ```
 
-### \_str().ltrim()
+### \_str().ltrim
 
 Remove whitespace from the left side of a string.
 
@@ -775,7 +861,7 @@ Remove whitespace from the left side of a string.
 console.log(_str('  Hello world  ').ltrim().get()); // 'Hello world  '
 ```
 
-### \_str().rtrim()
+### \_str().rtrim
 
 Remove whitespace from the right side of a string.
 
@@ -783,12 +869,28 @@ Remove whitespace from the right side of a string.
 console.log(_str('  Hello world  ').rtrim().get()); // '  Hello world'
 ```
 
-### \_str().trim()
+### \_str().trim
 
 Remove whitespace from both sides of a string.
 
 ```js
 console.log(_str('  Hello world  ').trim().get()); // 'Hello world'
+```
+
+### \_str().dump
+
+You can log the results of each processing segment for easy debugging.
+
+```js
+_str('/storage/files/logs/log.log')
+  .beforeLast('/')
+  .dump()
+  .after('/storage/')
+  .dump()
+  .toString();
+
+// /storage/files/logs
+// files/logs
 ```
 
 ## Collection
@@ -819,7 +921,7 @@ console.log(_col(123).all()); // [123]
 console.log(_col({ name: 'John', age: 30 }).all()); // [{ name: 'John', age: 30 }]
 ```
 
-### \_col().all()
+### \_col().all
 
 Get all items in the collection as an array.
 
@@ -828,7 +930,7 @@ console.log(_col().all()); // []
 console.log(_col([1, 2, 3, 4, 5]).all()); // [1, 2, 3, 4, 5]
 ```
 
-### \_col().chunk()
+### \_col().chunk
 
 Split an array into chunks of the specified size.
 
@@ -836,7 +938,7 @@ Split an array into chunks of the specified size.
 console.log(_col([1, 2, 3, 4, 5]).chunk(2).all()); // [[1, 2], [3, 4], [5]]
 ```
 
-### \_col().collapse()
+### \_col().collapse
 
 Collapse an array of arrays into a single array.
 
@@ -844,7 +946,7 @@ Collapse an array of arrays into a single array.
 console.log(_col([[1, 2], [3, 4], [5]]).collapse().all()); // [1, 2, 3, 4, 5]
 ```
 
-### \_col().collect()
+### \_col().collect
 
 Get a shallow copy of this collection.
 
@@ -852,7 +954,7 @@ Get a shallow copy of this collection.
 console.log(_col([1, 2, 3, 4, 5]).collect().all()); // [1, 2, 3, 4, 5]
 ```
 
-### \_col().concat()
+### \_col().concat
 
 The `concat` method concatenates the underlying array with the given array or collection and return a new collection.
 
@@ -860,7 +962,7 @@ The `concat` method concatenates the underlying array with the given array or co
 console.log(_col([1, 2, 3]).concat([3, 4, 5]).all()); // [1, 2, 3, 3, 4, 5]
 ```
 
-### \_col().contains()
+### \_col().contains
 
 Check if a value is present in the collection.
 
@@ -872,7 +974,7 @@ console.log(_col([1, 2, 3]).contains(2)); // true
 console.log(_col([1, 2, 3]).contains(value => value === 3)); // true
 ```
 
-### \_col().count()
+### \_col().count
 
 Get the number of items in the collection.
 
@@ -880,7 +982,7 @@ Get the number of items in the collection.
 console.log(_col([1, 2, 3]).count()); // 3
 ```
 
-### \_col().crossJoin()
+### \_col().crossJoin
 
 Cross join the given arrays.
 
@@ -901,7 +1003,7 @@ console.log(_col([1, 2]).crossJoin(['a', 'b'], ['I', 'II']).all());
 */
 ```
 
-### \_col().diff()
+### \_col().diff
 
 The `diff` method compares the collection against another collection or a plain array based on its values.
 This method will return the values in the original collection that are not present in the given collection or array.
@@ -912,7 +1014,7 @@ const diff = collection.diff([2, 4, 6, 8]);
 console.log(diff.all()); // [1, 3, 5]
 ```
 
-### \_col().each()
+### \_col().each
 
 This will iterate over the items in the collection and pass each item to the given callback.
 
@@ -932,7 +1034,7 @@ _col([1, 2, 3, 4, 5]).each(value => {
 }); // 1 2 3
 ```
 
-### \_col().every()
+### \_col().every
 
 The `every` method may be used to verify that all elements of a collection pass a given truth test.
 
@@ -946,7 +1048,7 @@ If the collection is empty, the `every` method will return `true`.
 console.log(_col().every(value => value < 4)); // true
 ```
 
-### \_col().filter()
+### \_col().filter
 
 The `filter` method filters the collection using the given callback,
 keeping only those items that pass a given truth test.
@@ -965,7 +1067,7 @@ const filtered = collection.filter();
 console.log(filtered.all()); // [1, 2, 3]
 ```
 
-### \_col().first()
+### \_col().first
 
 The `first` method returns the first element in the collection that passes a given truth test.
 
@@ -980,7 +1082,7 @@ If the collection is empty, it will return `undefined`.
 console.log(_col([1, 2, 3, 4, 5]).first()); // 1
 ```
 
-### \_col().forPage()
+### \_col().forPage
 
 The `forPage` method returns a new collection containing the items that would be present on a given page number.
 The method accepts the page number as its first argument and the number of items to show per page as its second argument.
@@ -992,7 +1094,7 @@ const page = collection.forPage(2, 3);
 console.log(page.all()); // [4, 5, 6]
 ```
 
-### \_col().groupBy()
+### \_col().groupBy
 
 The `groupBy` method groups the collection's items by a given key.
 
@@ -1017,7 +1119,7 @@ console.log(grouped.all());
 */
 ```
 
-### \_col().intersect()
+### \_col().intersect
 
 The `intersect` method removes any values from the original collection that are not present in the given collection or array.
 
@@ -1027,7 +1129,7 @@ const intersected = collection.intersect([1, 2, 4]);
 console.log(intersected.all()); // [1, 2, 4]
 ```
 
-### \_col().isEmpty()
+### \_col().isEmpty
 
 The `isEmpty` method returns `true` if the collection is empty, `false` otherwise.
 
@@ -1039,7 +1141,7 @@ const collection2 = _col([1, 2, 3]);
 console.log(collection2.isEmpty()); // false
 ```
 
-### \_col().isNotEmpty()
+### \_col().isNotEmpty
 
 The `isNotEmpty` method returns `true` if the collection is not empty, `false` otherwise.
 
@@ -1051,7 +1153,7 @@ const collection2 = _col([]);
 console.log(collection2.isNotEmpty()); // false
 ```
 
-### \_col().last()
+### \_col().last
 
 The `last` method returns the last element of the collection that passes a given truth test.
 
@@ -1068,7 +1170,7 @@ const collection = _col([1, 2, 3]);
 console.log(collection.last()); // 3
 ```
 
-### \_col().map()
+### \_col().map
 
 The `map` method iterates through the collection and passes each value to the given callback.
 The callback is free to modify the item and return it, thus forming a new collection of modified items.
@@ -1079,7 +1181,7 @@ const multiplied = collection.map(value => value * 2);
 console.log(multiplied.all()); // [2, 4, 6]
 ```
 
-### \_col().mapToGroups()
+### \_col().mapToGroups
 
 The `mapToGroups` method groups the collection's items by the given closure.
 The closure should return an array with two elements, the first being the group key and the second being the item.
@@ -1101,7 +1203,7 @@ console.log(grouped);
 */
 ```
 
-### \_col().merge()
+### \_col().merge
 
 The `merge` method merges the given array or collection with the original collection.
 Unlike the `concat` method, this method only merges non-existent elements in the origin collection
@@ -1134,7 +1236,7 @@ console.log(users1.all());
 */
 ```
 
-### \_col().pad()
+### \_col().pad
 
 The `pad` method will fill the array with the given value until the array reaches the specified size.
 To pad to the left, you should specify a negative size.
@@ -1149,7 +1251,7 @@ filtered = collection.pad(-5, 0);
 console.log(filtered.all()); // [0, 0, 1, 2, 3]
 ```
 
-### \_col().pluck()
+### \_col().pluck
 
 The `pluck` method retrieves all of the values for a given key.
 
@@ -1177,7 +1279,7 @@ const names = collection.pluck('department.name');
 console.log(names); // ['IT', 'Sales', 'Marketing']
 ```
 
-### \_col().pop()
+### \_col().pop
 
 The `pop` method removes and returns the last item from the collection.
 
@@ -1197,7 +1299,7 @@ console.log(popped); // [5, 4]
 console.log(collection.all()); // [1, 2, 3]
 ```
 
-### \_col().prepend()
+### \_col().prepend
 
 The `prepend` method will add the given value(s) to the beginning of the collection.
 
@@ -1207,7 +1309,7 @@ collection.prepend(-1, 0);
 console.log(collection.all()); // [-1, 0, 1, 2, 3]
 ```
 
-### \_col().push()
+### \_col().push
 
 The `push` method will add the given item to the end of the collection.
 
@@ -1217,7 +1319,7 @@ collection.push(4);
 console.log(collection.all()); // [1, 2, 3, 4]
 ```
 
-### \_col().random()
+### \_col().random
 
 The `random` method will return a random item from the collection.
 
@@ -1227,7 +1329,7 @@ const random = collection.random();
 console.log(random); // 3 - (retrieved randomly)
 ```
 
-### \_col().range()
+### \_col().range
 
 The `range` method returns a collection containing integers between the specified range.
 If the first argument is greater than the second, it will return a collection decreasing in value.
@@ -1254,7 +1356,7 @@ const collection = _col.range(3, 3);
 console.log(collection.all()); // [3]
 ```
 
-### \_col().reverse()
+### \_col().reverse
 
 The `reverse` method returns a new collection with the items in reverse order.
 
@@ -1264,7 +1366,7 @@ const reversed = collection.reverse();
 console.log(reversed.all()); // [5, 4, 3, 2, 1]
 ```
 
-### \_col().shift()
+### \_col().shift
 
 The `shift` method removes and returns the first element of the collection.
 
@@ -1275,7 +1377,7 @@ console.log(shifted); // 1
 console.log(collection.all()); // [2, 3, 4, 5]
 ```
 
-### \_col().shuffle()
+### \_col().shuffle
 
 The `shuffle` method returns a new collection with the items in random order.
 
@@ -1285,7 +1387,7 @@ const shuffled = collection.shuffle();
 console.log(shuffled.all()); // [3, 5, 2, 4, 1] - (retrieved randomly)
 ```
 
-### \_col().slice()
+### \_col().slice
 
 The `slice` method returns a new collection containing a slice of the items in the original collection.
 
@@ -1295,7 +1397,7 @@ const sliced = collection.slice(1, 4);
 console.log(sliced.all()); // [2, 3, 4]
 ```
 
-### \_col().sort()
+### \_col().sort
 
 The `sort` method returns a new collection with the items in sorted order.
 
@@ -1326,7 +1428,7 @@ console.log(sorted.all());
 */
 ```
 
-### \_col().splice()
+### \_col().splice
 
 The `splice` method removes and gets the spliced items in the collection.
 
@@ -1344,7 +1446,7 @@ collection3.splice(1, 0, 'Feb', 'Mar');
 console.log(collection3.all()); // ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
 ```
 
-#### \_col().split()
+#### \_col().split
 
 The `split` method breaks a collection into the given number of groups,
 filling non-terminal groups completely before allocating the remainder to the final group.
@@ -1355,7 +1457,7 @@ const groups = collection.split();
 console.log(groups.all()); // [[1, 2], [3, 4], [5]]
 ```
 
-### \_col().sum()
+### \_col().sum
 
 The `sum` method returns the sum of the items in the collection.
 
@@ -1382,7 +1484,7 @@ const sum = collection.sum('id');
 console.log(sum); // 3
 ```
 
-### \_col().tap()
+### \_col().tap
 
 The `tap` method passes the collection to the given callback,
 allowing you to `tap` into the collection at a specific point and do something with the items while not affecting
@@ -1399,7 +1501,7 @@ const shifted = _col([2, 4, 3, 1, 5])
 console.log(shifted); // 1
 ```
 
-### \_col().toArray()
+### \_col().toArray
 
 The `toArray` method returns all items in the collection as a plain array.
 If the item of the collection is an instance of the object has a `toArray` method,
@@ -1422,7 +1524,7 @@ console.log(all);
 */
 ```
 
-### \_col().toJson()
+### \_col().toJson
 
 The `toJson` method returns all items in the collection as a JSON string.
 
@@ -1432,7 +1534,7 @@ const json = collection.toJson();
 console.log(json); // "[1,2,3,4,5]"
 ```
 
-### \_col().toString()
+### \_col().toString
 
 The `toString` method is similar to the `toJson` method,
 except that for a sequential map collection, it returns a string containing the collection values ​​separated by commas.
@@ -1470,7 +1572,7 @@ const collection = _col(users).map(user => ({
 // {"id":1,"name":"User 1"},{"id":2,"name":"User 2"}
 ```
 
-### \_col().unique()
+### \_col().unique
 
 The `unique` method returns all of the unique items in the collection.
 
@@ -1488,7 +1590,7 @@ const unique = collection.unique('id');
 console.log(unique); // [{ id: 1, name: 'John' }, { id: 2, name: 'Jane' }]
 ```
 
-### \_col().when()
+### \_col().when
 
 The `when` method method will execute the given callback when the first argument given to the method evaluates to `true`.
 The collection instance and the first argument given to the `when` method will be provided to the callback.
@@ -1517,49 +1619,30 @@ Helper.isJSON();
 Helper.queryStringToObject();
 ```
 
-Some shared functions will be exported separately, you can call them directly to use them without going through Helper.
-
-### isset()
+### isset
 
 Determine if a variable is declared and is different than null.
-
-```js
-const { isset } = require('@noravel/supporter');
-
-// OR
-
-import { isset } from '@noravel/supporter';
-```
-
 Except for undefined and null, everything will return true;
 
 ```js
-console.log(isset(undefined)); // false
-console.log(isset(null)); // false
+console.log(Helper.isset(undefined)); // false
+console.log(Helper.isset(null)); // false
 ```
 
-### empty()
+### empty
 
 Determine whether a variable is empty.
 
 ```js
-const { empty } = require('@noravel/supporter');
-
-// OR
-
-import { empty } from '@noravel/supporter';
-```
-
-```js
-console.log(empty(undefined)); // true
-console.log(empty(null)); // true
-console.log(empty('')); // true
-console.log(empty(false)); // true
-console.log(empty(0)); // true
-console.log(empty([])); // true
-console.log(empty({})); // true
+console.log(Helper.empty(undefined)); // true
+console.log(Helper.empty(null)); // true
+console.log(Helper.empty('')); // true
+console.log(Helper.empty(false)); // true
+console.log(Helper.empty(0)); // true
+console.log(Helper.empty([])); // true
+console.log(Helper.empty({})); // true
 console.log(
-  empty({
+  Helper.empty({
     items: [],
     count() {
       return this.items.length;
@@ -1567,7 +1650,7 @@ console.log(
   }),
 ); // true
 console.log(
-  empty({
+  Helper.empty({
     isEmpty() {
       return true;
     },
@@ -1575,7 +1658,9 @@ console.log(
 ); // true
 ```
 
-### getArray()
+Some shared functions will be exported separately, you can call them directly to use them without going through Helper.
+
+### getArray
 
 const { Collection, getArray } = require('@noravel/supporter');
 
@@ -1588,7 +1673,7 @@ console.log(getArray({ toArray: () => [1, 2, 3] })); // [1, 2, 3]
 console.log(getArray('[1,2,3]')); // [1, 2, 3]
 ```
 
-### typeOf()
+### typeOf
 
 If you want to check the exact data type then typeOf will help you.
 
@@ -1648,7 +1733,7 @@ console.log(isConstructor(() => {})); // false
 console.log(isConstructor(Human)); // false
 ```
 
-### isJSON()
+### isJSON
 
 Check if a string value is json.
 
@@ -1666,7 +1751,7 @@ console.log(isJSON('[]')); // true
 console.log(isJSON('nam')); // false
 ```
 
-### queryStringToObject()
+### queryStringToObject
 
 Convert a query string to an object.
 

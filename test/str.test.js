@@ -1,4 +1,5 @@
-const { _str, Str } = require('../dist');
+const path = require('path');
+const { _str, Str } = require(path.resolve(__dirname, '../dist'));
 
 test('it can get string length', () => {
   expect(_str('Nam').length).toEqual(3);
@@ -129,7 +130,9 @@ describe('it can convert the given value', () => {
   });
 
   test('into a value with escaped Vietnamese characters', () => {
-    expect(_str('Trịnh Trần Phương Nam').nonUnicode().get()).toEqual('Trinh Tran Phuong Nam');
+    expect(_str('Đoàn quân Việt Nam đi, chung lòng cứu quốc').nonUnicode().get()).toEqual(
+      'Doan quan Viet Nam di, chung long cuu quoc',
+    );
   });
 
   test('to snake case', () => {
@@ -313,4 +316,62 @@ test('it can register a custom macro', () => {
 
   const actual = _str('hello').custom();
   expect(actual).toEqual('custom');
+});
+
+describe('it can convert the Markdown text to HTML', () => {
+  const md = `
+# Title
+
+This is for **testing**
+
+List:
+- item 1
+- item 2
+`;
+  const expectedWithoutMinify = `<h1>Title</h1>
+<p>This is for <strong>testing</strong></p>
+<p>List:</p>
+<ul>
+<li>item 1</li>
+<li>item 2</li>
+</ul>
+`;
+  const expectedWithMinify =
+    '<h1>Title</h1> ' +
+    '<p>This is for <strong>testing</strong></p> ' +
+    '<p>List:</p> ' +
+    '<ul> ' +
+    '<li>item 1</li> ' +
+    '<li>item 2</li> ' +
+    '</ul> ';
+
+  test('by static syncMdToHtml', () => {
+    const html = Str.syncMdToHtml(md);
+    const htmlMinify = Str.syncMdToHtml(md, true);
+    expect(html).toEqual(expectedWithoutMinify);
+    expect(htmlMinify).toEqual(expectedWithMinify);
+  });
+  test('by static mdToHtml', async () => {
+    const html = await Str.mdToHtml(md);
+    const htmlMinify = await Str.mdToHtml(md, true);
+    expect(html).toEqual(expectedWithoutMinify);
+    expect(htmlMinify).toEqual(expectedWithMinify);
+  });
+  test('by mdToHtml', () => {
+    const html = _str(md).mdToHtml().toString();
+    const htmlMinify = _str(md).mdToHtml(true).toString();
+    expect(html).toEqual(expectedWithoutMinify);
+    expect(htmlMinify).toEqual(expectedWithMinify);
+  });
+});
+
+test('it can dump data', () => {
+  const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+  _str('/storage/files/logs/log.log').beforeLast('/').dump().after('/storage/').dump();
+
+  const expected1 = '/storage/files/logs';
+  const expected2 = 'files/logs';
+
+  expect(consoleLogSpy).toHaveBeenNthCalledWith(1, expected1);
+  expect(consoleLogSpy).toHaveBeenNthCalledWith(2, expected2);
 });

@@ -184,8 +184,10 @@ export default class Collection<T = any> implements Arrayable<T>, Iterable<T>, J
   /**
    * Logs the items in the collection to the console.
    */
-  public dump(): void {
+  public dump(): this {
     console.log(this.items);
+
+    return this;
   }
 
   /**

@@ -1,4 +1,5 @@
-const { _col } = require('../dist');
+const path = require('path');
+const { _arr, _col } = require(path.resolve(__dirname, '../dist'));
 
 describe('it can be constructed', () => {
   test('with a non-arrayable object', () => {
@@ -766,7 +767,6 @@ test('it can pass the collection to the given callback and return the collection
   const collection = _col().range(1, 5);
   const actual = collection.tap(value => {
     expect(value.all()).toEqual([1, 2, 3, 4, 5]);
-    value.dump();
   });
   expect(actual.all()).toEqual([1, 2, 3, 4, 5]);
 });
@@ -935,4 +935,25 @@ test('it is an iterator', () => {
   for (const item of collection) {
     expect(collection.contains(item)).toBeTruthy();
   }
+});
+
+test('it can dump data', () => {
+  const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+  _col(_arr().range(3))
+    .dump()
+    .map(i => i + 1)
+    .dump();
+
+  const expected1 = new Map();
+  expected1.set('0', 1);
+  expected1.set('1', 2);
+  expected1.set('2', 3);
+
+  const expected2 = new Map();
+  expected2.set('0', 2);
+  expected2.set('1', 3);
+  expected2.set('2', 4);
+
+  expect(consoleLogSpy).toHaveBeenNthCalledWith(1, expected1);
+  expect(consoleLogSpy).toHaveBeenNthCalledWith(2, expected2);
 });

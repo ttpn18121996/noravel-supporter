@@ -1,0 +1,7 @@
+#ifndef CMARK_VERSION_H
+#define CMARK_VERSION_H
+
+#define CMARK_VERSION 0x001E03
+#define CMARK_VERSION_STRING "0.30.3"
+
+#endif

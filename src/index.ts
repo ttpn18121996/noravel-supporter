@@ -7,11 +7,13 @@ import Helper from './Support/Helper';
 
 /**
  * Check if a certain value exists or not.
+ * @deprecated Use `Helper.isset()` instead of `isset()`.
  */
 export const isset = Helper.isset;
 
 /**
  * Check if a certain value is empty or not.
+ * @deprecated Use `Helper.empty()` instead of `empty()`.
  */
 export const empty = Helper.empty;
 
@@ -71,4 +73,4 @@ export const _col = <T>(items: T | T[] = []) => {
   return Collection.wrap(items);
 };
 
-export { Arr, Collection, Obj, Str, StringHelper };
+export { Arr, Collection, Obj, Str, StringHelper, Helper };

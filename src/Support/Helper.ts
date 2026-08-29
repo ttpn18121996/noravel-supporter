@@ -1,4 +1,5 @@
 import Collection from '../Collection';
+import { TypeOfData } from '../types';
 
 export default class Helper {
   /**
@@ -104,10 +105,10 @@ export default class Helper {
    * Helper.typeOf({}); // 'object'
    * Helper.typeOf(() => {}); // 'function'
    */
-  static typeOf(value: any): string {
+  static typeOf(value: any): TypeOfData {
     const result = Object.prototype.toString.call(value).slice(8, -1).toLowerCase();
 
-    return result;
+    return result as TypeOfData;
   }
 
   /**

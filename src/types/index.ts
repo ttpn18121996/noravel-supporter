@@ -9,3 +9,5 @@ export interface Jsonable {
 export interface Stringable {
   toString(): string;
 }
+
+export type TypeOfData = 'array' | 'boolean' | 'function' | 'null' | 'number' | 'object' | 'string' | 'undefined';
