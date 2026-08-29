@@ -1,4 +1,5 @@
-const { _arr, Arr } = require('../dist');
+const path = require('path');
+const { _arr, Arr } = require(path.resolve(__dirname, '../dist'));
 
 test('it can collapse an array', () => {
   const arr = [

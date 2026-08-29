@@ -1,4 +1,5 @@
-const { _str, Str } = require('../dist');
+const path = require('path');
+const { _str, Str } = require(path.resolve(__dirname, '../dist'));
 
 test('it can get string length', () => {
   expect(_str('Nam').length).toEqual(3);
