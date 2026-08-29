@@ -1,6 +1,6 @@
 {
   "name": "@noravel/supporter",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "This is a support library for my personal projects.",
   "repository": {
     "type": "git",
@@ -17,7 +17,8 @@
     "test:coverage": "jest --verbose --coverage",
     "postversion": "git push --tags && npm publish --new-version $npm_package_version && git push && echo \"Successfully released version $npm_package_version!\"",
     "prettier:check": "prettier --ignore-path .prettierignore --check '**/*.{js,ts,json,md}'",
-    "prettier:fix": "prettier --ignore-path .prettierignore --write '**/*.{js,ts,json,md}'"
+    "prettier:fix": "prettier --ignore-path .prettierignore --write '**/*.{js,ts,json,md}'",
+    "gyp:build": "npx node-gyp rebuild --directory=native"
   },
   "files": [
     "dist"
@@ -27,8 +28,12 @@
   "license": "MIT",
   "homepage": "https://github.com/ttpn18121996/noravel-supporter",
   "devDependencies": {
+    "@types/node": "^26.4.0",
     "jest": "^30.2.0",
     "prettier": "^3.4",
-    "typescript": "^5.7"
+    "typescript": "^5.8"
+  },
+  "dependencies": {
+    "node-addon-api": "^8.9.2"
   }
 }
