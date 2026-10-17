@@ -2,12 +2,14 @@ import path from 'node:path';
 import fs from 'node:fs';
 
 // Declare `__webpack_require__` so that TypeScript does not flag it as an error.
-declare const __webpack_require__: {
-  (id: string): any;
-  resolve(id: string): string;
-  cache: Record<string, any>;
-  [key: string]: any;
-} | undefined;
+declare const __webpack_require__:
+  | {
+      (id: string): any;
+      resolve(id: string): string;
+      cache: Record<string, any>;
+      [key: string]: any;
+    }
+  | undefined;
 
 /**
  * Safe `require` for Bundler (Next.js/Webpack)
@@ -23,16 +25,12 @@ function loadNativeAddon() {
   const platform = process.platform;
   const arch = process.arch;
 
-  const possibleNames = [
-    'supporter_addon.node',
-    'node.napi.node',
-    `@noravel+supporter.node`
-  ];
+  const possibleNames = ['supporter_addon.node', 'node.napi.node', `@noravel+supporter.node`];
 
   const baseDirs = [
     path.join(process.cwd(), 'node_modules', '@noravel', 'supporter'),
     path.resolve(__dirname, '..'),
-    path.resolve(__dirname, '.')
+    path.resolve(__dirname, '.'),
   ];
 
   for (const baseDir of baseDirs) {
@@ -55,7 +53,7 @@ function loadNativeAddon() {
   } catch (err) {
     throw new Error(
       `[noravel-supporter] No native build found for platform=${platform} arch=${arch}. ` +
-      `Please ensure prebuilds are correctly installed.`
+        `Please ensure prebuilds are correctly installed.`,
     );
   }
 }
