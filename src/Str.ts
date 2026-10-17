@@ -1,10 +1,6 @@
-import path from 'node:path';
-
+import addon from './binding';
 import StringHelper, { RandomOptions } from './Support/StringHelper';
 import { Stringable } from './types';
-
-const loadBinding = require('node-gyp-build');
-const addon = loadBinding(path.resolve(__dirname, '..'));
 
 export default class Str implements Stringable {
   public value: String;
