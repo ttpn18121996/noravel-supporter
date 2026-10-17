@@ -1,5 +1,4 @@
-const path = require('path');
-const { _arr, _col } = require(path.resolve(__dirname, '..', 'dist', 'index.js'));
+const { _arr, _col } = require('../dist');
 
 describe('it can be constructed', () => {
   test('with a non-arrayable object', () => {
