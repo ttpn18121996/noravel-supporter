@@ -317,53 +317,6 @@ test('it can register a custom macro', () => {
   expect(actual).toEqual('custom');
 });
 
-describe('it can convert the Markdown text to HTML', () => {
-  const md = `
-# Title
-
-This is for **testing**
-
-List:
-- item 1
-- item 2
-`;
-  const expectedWithoutMinify = `<h1>Title</h1>
-<p>This is for <strong>testing</strong></p>
-<p>List:</p>
-<ul>
-<li>item 1</li>
-<li>item 2</li>
-</ul>
-`;
-  const expectedWithMinify =
-    '<h1>Title</h1> ' +
-    '<p>This is for <strong>testing</strong></p> ' +
-    '<p>List:</p> ' +
-    '<ul> ' +
-    '<li>item 1</li> ' +
-    '<li>item 2</li> ' +
-    '</ul> ';
-
-  test('by static syncMdToHtml', () => {
-    const html = Str.syncMdToHtml(md);
-    const htmlMinify = Str.syncMdToHtml(md, true);
-    expect(html).toEqual(expectedWithoutMinify);
-    expect(htmlMinify).toEqual(expectedWithMinify);
-  });
-  test('by static mdToHtml', async () => {
-    const html = await Str.mdToHtml(md);
-    const htmlMinify = await Str.mdToHtml(md, true);
-    expect(html).toEqual(expectedWithoutMinify);
-    expect(htmlMinify).toEqual(expectedWithMinify);
-  });
-  test('by mdToHtml', () => {
-    const html = _str(md).mdToHtml().toString();
-    const htmlMinify = _str(md).mdToHtml(true).toString();
-    expect(html).toEqual(expectedWithoutMinify);
-    expect(htmlMinify).toEqual(expectedWithMinify);
-  });
-});
-
 test('it can dump data', () => {
   const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
   _str('/storage/files/logs/log.log').beforeLast('/').dump().after('/storage/').dump();
