@@ -1768,3 +1768,70 @@ console.log(queryStringToObject('?search[name]=Nam&sort_field=id&sort_direction=
 
 // { search: { name: 'Nam' }, sort_field: 'id', sort_direction: 'desc' }
 ```
+
+## Native services
+
+Native services are built using C/C++ and can therefore only run on a Node.js server;
+they cannot be used on the client side.
+
+### MarkdownService
+
+MarkdownService provides you with two static methods:
+`syncMdToHtml` for synchronous processing and `mdToHtml` for asynchronous processing.
+
+```js
+const { MarkdownService } = require('@noravel/supporter/native');
+
+// OR
+
+import { MarkdownService } from '@noravel/supporter/native';
+```
+
+`syncMdToHtml` and `mdToHtml` both require two parameters: the first is a Markdown string,
+and the second is a flag that determines whether the output HTML should be minified or unminified.
+This second parameter is called `minify`; setting it to `true` results in minified output,
+while setting it to `false` (the default value) produces unminified output.
+
+```js
+const md = `
+# Hello
+
+This is **noravel supporter**
+
+noravel:
+- supporter
+- pagination
+- validation
+- logger
+`;
+
+console.log(MarkdownService.syncMdToHtml(md));
+
+console.log(await MarkdownService.mdToHtml(md));
+```
+
+The result will be an unminified HTML string.
+
+```text
+<h1>Hello</h1>
+<p>This is <strong>noravel supporter</strong></p>
+<p>noravel:</p>
+<ul>
+<li>supporter</li>
+<li>pagination</li>
+<li>validation</li>
+<li>logger</li>
+</ul>
+```
+
+Minify HTML string
+
+```js
+console.log(MarkdownService.syncMdToHtml(md, true));
+
+console.log(await MarkdownService.mdToHtml(md, true));
+```
+
+```text
+<h1>Hello</h1> <p>This is <strong>noravel supporter</strong></p> <p>noravel:</p> <ul> <li>supporter</li> <li>pagination</li> <li>validation</li> <li>logger</li> </ul>
+```
