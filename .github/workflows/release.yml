@@ -1,0 +1,80 @@
+name: Build Prebuilds & Publish to NPM
+
+on:
+  push:
+    branches:
+      - master
+    # (Tùy chọn) Bỏ qua nếu chỉ sửa file tài liệu như README.md
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+
+jobs:
+  build-prebuilds:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux-x64
+          - os: windows-latest
+            platform: win32-x64
+          - os: macos-13       # macOS Intel (x64)
+            platform: darwin-x64
+          - os: macos-latest   # macOS Apple Silicon (arm64)
+            platform: darwin-arm64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Native Prebuild
+        run: npm run make:prebuild
+
+      - name: Upload prebuild artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: prebuild-${{ matrix.platform }}
+          path: prebuilds/
+
+  publish-npm:
+    needs: build-prebuilds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build TypeScript (dist)
+        run: npm run build
+
+      - name: Download all prebuilds and merge into prebuilds/
+        uses: actions/download-artifact@v4
+        with:
+          pattern: prebuild-*
+          path: prebuilds/
+          merge-multiple: true
+
+      - name: Verify prebuilds structure
+        run: ls -laR prebuilds/
+
+      - name: Publish to NPM
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
