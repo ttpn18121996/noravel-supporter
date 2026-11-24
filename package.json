@@ -25,9 +25,7 @@
   },
   "files": [
     "dist",
-    "prebuilds",
-    "binding.gyp",
-    "native"
+    "prebuilds"
   ],
   "exports": {
     ".": {
